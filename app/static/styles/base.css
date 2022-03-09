@@ -1,0 +1,45 @@
+.header{
+    width: 100%;
+    height: 50px;
+    position: sticky;
+    background-color: #A3E8B2;
+    padding: 10px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    box-sizing: border-box;
+}
+.logo{
+    float: left;
+    height: 100%;
+}
+.search{
+    height: 100%;
+}
+.account{
+    float: right;
+    height: 100%;
+}
+.account_image{
+    
+}
+.account_name{
+    
+}
+input{
+    height: 100%;
+}
+img{
+    height: 100%;
+    object-fit: contain;
+}
+body{
+    margin: 0;
+    padding: 0;
+}
+.search_form{
+    height: 100%;
+}
+button{
+    height: 100%;
+}

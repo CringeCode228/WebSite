@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/base.css') }}">
+    <title>
+        {% block title %}
+        
+        {% endblock %}
+    </title>
+    <body>
+        <div class="header">
+            <div class="logo">
+                <a href="{{ url_for('index') }}">
+                    <img src="{{ url_for('static', filename='/images/logo.png')}}">
+                </a>
+            </div>
+            <div class="search">
+                <form action="{{ url_for('search') }}" method="get" class="search_form">
+                    <input type="search" name="search">
+                    <button type="submit" name="submit">
+                        <img src="{{ url_for('static', filename='images/search.png') }}">
+                    </button>
+                </form>
+            </div>
+            <div class="account">
+                <div class="account_image">
+                    <img src="{{ user.avatar }}">
+                </div>
+                <div class="account_name">
+                    {{ user.username }}
+                </div>
+            </div>
+        </div>
+        <div class="main">
+            {% block main %}
+            
+            {% endblock %}
+        </div>
+    </body>
+</html>
