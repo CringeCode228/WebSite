@@ -37,6 +37,22 @@ class User(db.Model, UserMixin):
         return self.user_id
 
 
+class Student(User):
+    pass
+
+
+class Parent(User):
+    pass
+
+
+class Teacher(User):
+    pass
+
+
+class Admin(User):
+    pass
+
+
 class NotLoggedUser(AnonymousUserMixin):
     username = "Sign In"
 
