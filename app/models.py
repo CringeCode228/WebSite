@@ -3,26 +3,23 @@ from enum import Enum
 import sqlalchemy
 from flask_login import UserMixin, AnonymousUserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
-
-
-class Role(Enum):
-    default = 0
-    moderator = 1
-    admin = 2
+from sqlalchemy import orm
 
 
 class User(db.Model, UserMixin):
-    user_id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(32), unique=True)
-    password = db.Column(db.String(102))
-    email = db.Column(db.String(256), unique=True)
-    role = db.Column(db.Enum(Role))
 
-    def __init__(self, username, password, email, role):
+    __mapper_args__ = {'polymorphic_identity': 'user'}
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, nullable=False)
+    authorization_code = sqlalchemy.Column(sqlalchemy.Integer, unique=True, nullable=False)
+    name = sqlalchemy.Column(sqlalchemy.String(32), nullable=False)
+    surname = sqlalchemy.Column(sqlalchemy.String(32), nullable=False)
+    password = sqlalchemy.Column(sqlalchemy.String(102), nullable=False)
+    email = sqlalchemy.Column(sqlalchemy.String(256), unique=True)
+
+    def __init__(self, username, password, email):
         self.username = username
         self.set_password(password)
         self.email = email
-        self.role = role
 
     def __repr__(self):
         return "<User {}>".format(self.username)
@@ -38,19 +35,53 @@ class User(db.Model, UserMixin):
 
 
 class Student(User):
-    pass
+    __mapper_args__ = {'polymorphic_identity': 'student'}
+    id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("user.id"), primary_key=True)
+    user = orm.relationship("user")
 
 
 class Parent(User):
-    pass
+    __mapper_args__ = {'polymorphic_identity': 'parent'}
+    id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("user.id"), primary_key=True)
+    user = orm.relationship("user")
 
 
 class Teacher(User):
-    pass
+    __mapper_args__ = {'polymorphic_identity': 'teacher'}
+    id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("user.id"), primary_key=True)
+    user = orm.relationship("user")
 
 
 class Admin(User):
+    __mapper_args__ = {'polymorphic_identity': 'admin'}
+    id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("user.id"), primary_key=True)
+    user = orm.relationship("user")
+
+
+class Lesson:
+    name = sqlalchemy.Column(sqlalchemy.String(32), primary_key=True, unique=True)
+
+
+class Rate:
+    rate = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.CheckConstraint("rate>=2"),
+                             sqlalchemy.CheckConstraint("rate<=5"))
+    student_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("student.id"))
+    student = orm.relationship("student")
+
+
+class SchoolClass:
+    number = sqlalchemy.Column(sqlalchemy.Integer)
+    symbol = sqlalchemy.Column(sqlalchemy.String(1))
+    class_manager_id = sqlalchemy.Column()
+
+
+class Day:
     pass
+
+
+class School:
+    number = sqlalchemy.Column(sqlalchemy.Integer)
+    name = sqlalchemy.Column(sqlalchemy.String(120))
 
 
 class NotLoggedUser(AnonymousUserMixin):
