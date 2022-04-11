@@ -30,7 +30,7 @@ def error404(error):
 @application.errorhandler(500)
 def error(error):
     return render_template("error.html", error_text="Sorry, internal server error(",
-                           error_image=images/error.png, user=current_user)
+                           error_image="images/error.png", user=current_user)
 
 
 @application.route("/search")

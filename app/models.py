@@ -58,28 +58,32 @@ class Admin(User):
     user = orm.relationship("user")
 
 
-class Lesson:
-    name = sqlalchemy.Column(sqlalchemy.String(32), primary_key=True, unique=True)
+class Subject(db.Model):
+    name = sqlalchemy.Column(sqlalchemy.String(32), primary_key=True)
 
 
-class Rate:
+class Lesson(db.Model):
+    subject = sqlalchemy.Column(sqlalchemy.String(32), primary_key=True)
+
+
+class Rate(db.Model):
     rate = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.CheckConstraint("rate>=2"),
                              sqlalchemy.CheckConstraint("rate<=5"))
     student_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("student.id"))
     student = orm.relationship("student")
 
 
-class SchoolClass:
+class SchoolClass(db.Model):
     number = sqlalchemy.Column(sqlalchemy.Integer)
     symbol = sqlalchemy.Column(sqlalchemy.String(1))
     class_manager_id = sqlalchemy.Column()
 
 
-class Day:
+class Day(db.Model):
     pass
 
 
-class School:
+class School(db.Model):
     number = sqlalchemy.Column(sqlalchemy.Integer)
     name = sqlalchemy.Column(sqlalchemy.String(120))
 
