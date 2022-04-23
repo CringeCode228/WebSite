@@ -7,8 +7,13 @@ from sqlalchemy import orm
 
 
 student_achievement = sqlalchemy.Table('student_achievement',
-                                       sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('student.id')),
-                                       sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('achievement.id')))
+                                       db.metadata,
+                                       sqlalchemy.Column('id', sqlalchemy.Integer, primary_key=True,
+                                                         autoincrement=False),
+                                       sqlalchemy.Column('student', sqlalchemy.Integer,
+                                                         sqlalchemy.ForeignKey('student.id')),
+                                       sqlalchemy.Column('achievement', sqlalchemy.Integer,
+                                                         sqlalchemy.ForeignKey('achievement.id')))
 
 
 class User(db.Model, UserMixin):
@@ -19,7 +24,7 @@ class User(db.Model, UserMixin):
     name = sqlalchemy.Column(sqlalchemy.String(32), nullable=False)
     surname = sqlalchemy.Column(sqlalchemy.String(32), nullable=False)
     password = sqlalchemy.Column(sqlalchemy.String(102), nullable=False)
-    email = sqlalchemy.Column(sqlalchemy.String(256), unique=True)
+    email = sqlalchemy.Column(sqlalchemy.String(255), unique=True)
 
     students = db.relationship('Student', backref='user', lazy='dynamic')
     parents = db.relationship('Parent', backref='user', lazy='dynamic')
@@ -44,7 +49,7 @@ class User(db.Model, UserMixin):
         return self.user_id
 
 
-class Student(User):
+class Student(db.Model):
     __mapper_args__ = {'polymorphic_identity': 'student'}
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
@@ -58,7 +63,7 @@ class Student(User):
     achievement = orm.relationship("Achievement", secondary=student_achievement, backref='students')
 
 
-class Parent(User):
+class Parent(db.Model):
     __mapper_args__ = {'polymorphic_identity': 'parent'}
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
@@ -67,7 +72,7 @@ class Parent(User):
     kids = db.relationship('Student', backref='parent', lazy='dynamic')
 
 
-class Teacher(User):
+class Teacher(db.Model):
     __mapper_args__ = {'polymorphic_identity': 'teacher'}
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
@@ -76,11 +81,12 @@ class Teacher(User):
     lessons = orm.relationship('Lesson', backref='teacher', lazy='dynamic')
 
 
-class Admin(User):
+class Admin(db.Model):
     __mapper_args__ = {'polymorphic_identity': 'admin'}
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
     user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("user.id"))
+    school_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("school.id"))
 
 
 class Subject(db.Model):
@@ -97,6 +103,8 @@ class Lesson(db.Model):
     duration = sqlalchemy.Column(sqlalchemy.Integer, nullable=False, default=45)
     teacher_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("teacher.id"), nullable=False)
     cabinet = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("cabinet.id"), nullable=False)
+    missing_students = sqlalchemy.Column(sqlalchemy.String(255))
+    homework = sqlalchemy.Column(sqlalchemy.Text(1000))
 
 
 class Cabinet(db.Model):
@@ -124,6 +132,8 @@ class School(db.Model):
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
     number = sqlalchemy.Column(sqlalchemy.Integer, nullable=False)
     name = sqlalchemy.Column(sqlalchemy.String(120))
+
+    admins = orm.relationship('Admin', backref='school', lazy='dynamic')
 
 
 class Timetable(db.Model):
