@@ -6,15 +6,25 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import orm
 
 
+student_achievement = sqlalchemy.Table('student_achievement',
+                                       sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('student.id')),
+                                       sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('achievement.id')))
+
+
 class User(db.Model, UserMixin):
 
     __mapper_args__ = {'polymorphic_identity': 'user'}
-    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, nullable=False)
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
     authorization_code = sqlalchemy.Column(sqlalchemy.Integer, unique=True, nullable=False)
     name = sqlalchemy.Column(sqlalchemy.String(32), nullable=False)
     surname = sqlalchemy.Column(sqlalchemy.String(32), nullable=False)
     password = sqlalchemy.Column(sqlalchemy.String(102), nullable=False)
     email = sqlalchemy.Column(sqlalchemy.String(256), unique=True)
+
+    students = db.relationship('Student', backref='user', lazy='dynamic')
+    parents = db.relationship('Parent', backref='user', lazy='dynamic')
+    teachers = db.relationship('Teacher', backref='user', lazy='dynamic')
+    admins = db.relationship('Admin', backref='user', lazy='dynamic')
 
     def __init__(self, username, password, email):
         self.username = username
@@ -36,56 +46,122 @@ class User(db.Model, UserMixin):
 
 class Student(User):
     __mapper_args__ = {'polymorphic_identity': 'student'}
-    id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("user.id"), primary_key=True)
-    user = orm.relationship("user")
+
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
+    user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("user.id"), nullable=False)
+    class_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("class.id"), nullable=False)
+    mother = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("parent.id"))
+    father = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("parent.id"))
+    score = sqlalchemy.Column(sqlalchemy.Integer, nullable=False, default=0)
+
+    rates = orm.relationship("Rate", backref="student", lazy='dynamic')
+    achievement = orm.relationship("Achievement", secondary=student_achievement, backref='students')
 
 
 class Parent(User):
     __mapper_args__ = {'polymorphic_identity': 'parent'}
-    id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("user.id"), primary_key=True)
-    user = orm.relationship("user")
+
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
+    user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("user.id"))
+
+    kids = db.relationship('Student', backref='parent', lazy='dynamic')
 
 
 class Teacher(User):
     __mapper_args__ = {'polymorphic_identity': 'teacher'}
-    id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("user.id"), primary_key=True)
-    user = orm.relationship("user")
+
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
+    user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("user.id"))
+
+    lessons = orm.relationship('Lesson', backref='teacher', lazy='dynamic')
 
 
 class Admin(User):
     __mapper_args__ = {'polymorphic_identity': 'admin'}
-    id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("user.id"), primary_key=True)
-    user = orm.relationship("user")
+
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
+    user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("user.id"))
 
 
 class Subject(db.Model):
-    name = sqlalchemy.Column(sqlalchemy.String(32), primary_key=True)
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
+    name = sqlalchemy.Column(sqlalchemy.String(32), nullable=False)
+
+    textbooks = orm.relationship('Textbooks', backref='subject', lazy='dynamic')
 
 
 class Lesson(db.Model):
-    subject = sqlalchemy.Column(sqlalchemy.String(32), primary_key=True)
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
+    subject_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("subject.id"), nullable=False)
+    datetime = sqlalchemy.Column(sqlalchemy.DateTime, nullable=False)
+    duration = sqlalchemy.Column(sqlalchemy.Integer, nullable=False, default=45)
+    teacher_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("teacher.id"), nullable=False)
+    cabinet = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("cabinet.id"), nullable=False)
+
+
+class Cabinet(db.Model):
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
+    number = sqlalchemy.Column(sqlalchemy.Integer, nullable=False)
+    name = sqlalchemy.Column(sqlalchemy.String(32))
 
 
 class Rate(db.Model):
-    rate = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.CheckConstraint("rate>=2"),
-                             sqlalchemy.CheckConstraint("rate<=5"))
-    student_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("student.id"))
-    student = orm.relationship("student")
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
+    rate = sqlalchemy.Column(sqlalchemy.Integer, nullable=False)
+    student_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("student.id"), nullable=False)
+    lesson_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("lesson.id"), nullable=False)
 
 
-class SchoolClass(db.Model):
-    number = sqlalchemy.Column(sqlalchemy.Integer)
-    symbol = sqlalchemy.Column(sqlalchemy.String(1))
-    class_manager_id = sqlalchemy.Column()
-
-
-class Day(db.Model):
-    pass
+class Class(db.Model):
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
+    number = sqlalchemy.Column(sqlalchemy.Integer, nullable=False)
+    symbol = sqlalchemy.Column(sqlalchemy.String(1), nullable=False)
+    class_manager_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("teacher.id"), nullable=False)
+    timetable_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("timetable.id"))
 
 
 class School(db.Model):
-    number = sqlalchemy.Column(sqlalchemy.Integer)
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
+    number = sqlalchemy.Column(sqlalchemy.Integer, nullable=False)
     name = sqlalchemy.Column(sqlalchemy.String(120))
+
+
+class Timetable(db.Model):
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
+    Monday = sqlalchemy.Column(sqlalchemy.String(100))
+    Tuesday = sqlalchemy.Column(sqlalchemy.String(100))
+    Wednesday = sqlalchemy.Column(sqlalchemy.String(100))
+    Thursday = sqlalchemy.Column(sqlalchemy.String(100))
+    Friday = sqlalchemy.Column(sqlalchemy.String(100))
+    Saturday = sqlalchemy.Column(sqlalchemy.String(100))
+    Sunday = sqlalchemy.Column(sqlalchemy.String(100))
+
+    class_id = orm.relationship('Class', backref='timetable', uselist=False)
+
+
+class TimetableLesson(db.Model):
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
+    subject_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("subject.id"), nullable=False)
+    time = sqlalchemy.Column(sqlalchemy.Time, nullable=False)
+    duration = sqlalchemy.Column(sqlalchemy.Integer, nullable=False, default=45)
+    teacher_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("teacher.id"), nullable=False)
+    cabinet = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("cabinet.id"), nullable=False)
+
+
+class Textbook(db.Model):
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
+    subject_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("subject.id"), nullable=False)
+    class_number = sqlalchemy.Column(sqlalchemy.Integer, nullable=False)
+    link = sqlalchemy.Column(sqlalchemy.String(100), nullable=False)
+
+
+class Achievement(db.Model):
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
+    name = sqlalchemy.Column(sqlalchemy.String(32), nullable=False)
+    text = sqlalchemy.Column(sqlalchemy.String(50))
+    score = sqlalchemy.Column(sqlalchemy.Integer, nullable=False)
+
+    students = orm.relationship('Student', backref='achievement', lazy='dynamic')
 
 
 class NotLoggedUser(AnonymousUserMixin):
