@@ -17,8 +17,6 @@ student_achievement = sqlalchemy.Table('student_achievement',
 
 
 class User(db.Model, UserMixin):
-
-    __mapper_args__ = {'polymorphic_identity': 'user'}
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
     authorization_code = sqlalchemy.Column(sqlalchemy.Integer, unique=True, nullable=False)
     name = sqlalchemy.Column(sqlalchemy.String(32), nullable=False)
@@ -26,10 +24,10 @@ class User(db.Model, UserMixin):
     password = sqlalchemy.Column(sqlalchemy.String(102), nullable=False)
     email = sqlalchemy.Column(sqlalchemy.String(255), unique=True)
 
-    students = db.relationship('Student', backref='user', lazy='dynamic')
-    parents = db.relationship('Parent', backref='user', lazy='dynamic')
-    teachers = db.relationship('Teacher', backref='user', lazy='dynamic')
-    admins = db.relationship('Admin', backref='user', lazy='dynamic')
+    students = db.relationship('Student', backref='student_user_data', lazy='dynamic')
+    parents = db.relationship('Parent', backref='parent_user_data', lazy='dynamic')
+    teachers = db.relationship('Teacher', backref='teacher_user_data', lazy='dynamic')
+    admins = db.relationship('Admin', backref='admin_user_data', lazy='dynamic')
 
     def __init__(self, username, password, email):
         self.username = username
@@ -50,13 +48,11 @@ class User(db.Model, UserMixin):
 
 
 class Student(db.Model):
-    __mapper_args__ = {'polymorphic_identity': 'student'}
-
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
     user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("user.id"), nullable=False)
     class_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("class.id"), nullable=False)
-    mother = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("parent.id"))
-    father = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("parent.id"))
+    mother_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("parent.id"))
+    father_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("parent.id"))
     score = sqlalchemy.Column(sqlalchemy.Integer, nullable=False, default=0)
 
     rates = orm.relationship("Rate", backref="student", lazy='dynamic')
@@ -64,8 +60,6 @@ class Student(db.Model):
 
 
 class Parent(db.Model):
-    __mapper_args__ = {'polymorphic_identity': 'parent'}
-
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
     user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("user.id"))
 
@@ -73,8 +67,6 @@ class Parent(db.Model):
 
 
 class Teacher(db.Model):
-    __mapper_args__ = {'polymorphic_identity': 'teacher'}
-
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
     user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("user.id"))
 
@@ -82,8 +74,6 @@ class Teacher(db.Model):
 
 
 class Admin(db.Model):
-    __mapper_args__ = {'polymorphic_identity': 'admin'}
-
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
     user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("user.id"))
     school_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("school.id"))
@@ -170,8 +160,6 @@ class Achievement(db.Model):
     name = sqlalchemy.Column(sqlalchemy.String(32), nullable=False)
     text = sqlalchemy.Column(sqlalchemy.String(50))
     score = sqlalchemy.Column(sqlalchemy.Integer, nullable=False)
-
-    students = orm.relationship('Student', backref='achievement', lazy='dynamic')
 
 
 class NotLoggedUser(AnonymousUserMixin):
