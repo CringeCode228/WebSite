@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>
+        Admin panel -
+        {% block title %}
+
+        {% endblock %}
+    </title>
+</head>
+<body>
+    {% block main %}
+
+    {% endblock %}
+    {% block new %}
+
+    {% endblock %}
+
+    <br>
+    <a href="{{ url_for('admin_panel_students') }}">Редактировать список учеников</a><br>
+    <a href="{{ url_for('admin_panel_parents') }}">Редактировать список родителей</a><br>
+    <a href="{{ url_for('admin_panel_teachers') }}">Редактировать список учителей</a><br>
+    <a href="{{ url_for('admin_panel_classes') }}">Редактировать список классов</a><br>
+    <a href="{{ url_for('admin_panel_subjects') }}">Редактировать список предметов</a><br>
+    <a href="{{ url_for('admin_panel_lessons') }}">Редактировать список уроков</a><br>
+    <a href="{{ url_for('admin_panel_timetable') }}">Редактировать распиание</a><br>
+    <a href="{{ url_for('admin_panel_cabinets') }}">Редактировать список кабинетов</a><br>
+    <a href="{{ url_for('admin_panel_rates') }}">Редактировать список оценок</a><br>
+    <a href="{{ url_for('admin_panel_textbooks') }}">Редактировать список книг</a><br>
+    <a href="{{ url_for('admin_panel_achievements') }}">Редактировать список достижений</a><br>
+</body>
+</html>

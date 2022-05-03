@@ -1,0 +1,55 @@
+{% extends "/admin/base.html" %}
+
+{% block title %}
+    Students
+{% endblock %}
+
+{% block main %}
+    <table border="1">
+        <tr>
+            <td>ID</td>
+            <td>ФИ</td>
+            <td>класс</td>
+            <td>оценки</td>
+            <td>родители</td>
+            <td>достижения</td>
+        </tr>
+        {% for student in students %}
+        <tr>
+            <td>
+                <a href="{{ url_for('admin_panel_students_{{ student.id }}') }}">ID</a>
+            </td>
+            <td>{{ student.student_user_data.surename }} {{ student.student_user_data.name }}</td>
+            <td>{{ student.class.number }}{{ student.class.symbol }}</td>
+            <td>
+                <a href="{{ url_for('admin_panel_students_{{ student.id }}_rates') }}"></a>
+            </td>
+            <td>
+                <a href="{{ url_for('admin_panel_students_{{ student.id }}_mother') }}">Мама</a><br>
+                <a href="{{ url_for('admin_panel_students_{{ student.id }}_father') }}">папа</a>
+            </td>
+            <td>
+                <a href="{{ url_for('admin_panel_students_{{ student.id }}_achievements') }}"></a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    <div>
+        <a href="{{ url_for('admin_panel_students_new') }}">Новый ученик</a>
+    </div>
+{% endblock %}
+{% block new %}
+    {% if form is defined %}
+        <form action="{{ url_for('admin_panel_students_new') }}" method="post">
+            {{ form.csrf_token }}
+            {{ form.authorization_code }}<br>
+            {{ form.name }}<br>
+            {{ form.surename }}<br>
+            {{ form.password }}<br>
+            {{ form.password_check }}<br>
+            {{ form.email }}<br>
+            {{ form.school_id }}
+            {{ form.submit }}
+        </form>
+    {% endif %}
+{% endblock %}

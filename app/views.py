@@ -2,6 +2,7 @@ from app import application
 from flask import render_template
 from app import forms
 from app import authorization
+from app import admin_panel
 from flask import request
 from app import loginManager
 from flask_login import login_required, current_user
@@ -47,3 +48,8 @@ def login_only():
 @loginManager.unauthorized_handler
 def not_login():
     return redirect(url_for("login"))
+
+
+@application.route("/students")
+def students():
+    return "students"
