@@ -1,7 +1,13 @@
 {% extends "/admin/base.html" %}
 
 {% block title %}
-    Students
+    {% if new_form is defined %}
+        New student
+    {% elif update_form is defined %}
+        Edit {{ current_student.student_user_data.name }}{{ current_student.student_user_data.surname }}
+    {% else %}
+        Students
+    {% endif %}
 {% endblock %}
 
 {% block main %}
@@ -17,19 +23,19 @@
         {% for student in students %}
         <tr>
             <td>
-                <a href="{{ url_for('admin_panel_students_{{ student.id }}') }}">ID</a>
+                <a href="{{ url_for('admin_panel_students_update', id=student.id) }}">{{ student.id }}</a>
             </td>
-            <td>{{ student.student_user_data.surename }} {{ student.student_user_data.name }}</td>
-            <td>{{ student.class.number }}{{ student.class.symbol }}</td>
+            <td>{{ student.student_user_data.surname }} {{ student.student_user_data.name }}</td>
+            <td><a href="{{ url_for('admin_panel_classes', id=student.student_class_data.id) }}">{{ student.student_class_data.number }}{{ student.student_class_data.symbol }}</a></td>
             <td>
-                <a href="{{ url_for('admin_panel_students_{{ student.id }}_rates') }}"></a>
-            </td>
-            <td>
-                <a href="{{ url_for('admin_panel_students_{{ student.id }}_mother') }}">Мама</a><br>
-                <a href="{{ url_for('admin_panel_students_{{ student.id }}_father') }}">папа</a>
+                <a href="{{ url_for('admin_panel_rates', filter=student.id, field='id') }}">оценки</a>
             </td>
             <td>
-                <a href="{{ url_for('admin_panel_students_{{ student.id }}_achievements') }}"></a>
+                <a href="{{ url_for('admin_panel_parents', id=student.mother.id) }}">Мама</a><br>
+                <a href="{{ url_for('admin_panel_parents', id=student.father.id) }}">папа</a>
+            </td>
+            <td>
+                <a href="{{ url_for('admin_panel_achievements', filter=student.id) }}"></a>
             </td>
         </tr>
         {% endfor %}
@@ -39,17 +45,42 @@
     </div>
 {% endblock %}
 {% block new %}
-    {% if form is defined %}
+    {% if new_form is defined %}
         <form action="{{ url_for('admin_panel_students_new') }}" method="post">
-            {{ form.csrf_token }}
-            {{ form.authorization_code }}<br>
-            {{ form.name }}<br>
-            {{ form.surename }}<br>
-            {{ form.password }}<br>
-            {{ form.password_check }}<br>
-            {{ form.email }}<br>
-            {{ form.school_id }}
-            {{ form.submit }}
+            {% for error in new_form.form_errors %}
+                <p>{{ error }}</p>
+            {% endfor %}
+            {{ new_form.csrf_token }}
+            {{ new_form.authorization_code }}<br>
+            {{ new_form.name }}<br>
+            {{ new_form.surname }}<br>
+            {{ new_form.password }}<br>
+            {{ new_form.password_check }}<br>
+            {{ new_form.email }}<br>
+            {{ new_form.class_id }}<br>
+            {{ new_form.mother_id }}<br>
+            {{ new_form.father_id }}<br>
+            {{ new_form.submit }}
+        </form>
+    {% endif %}
+{% endblock %}
+{% block update %}
+    {% if update_form is defined %}
+        <form action="{{ url_for('admin_panel_students_update', id=current_student.id) }}" method="post">
+            {% for error in update_form.errors %}
+                <p>{{ error }}</p>
+            {% endfor %}
+            {{ update_form.csrf_token }}
+            {{ update_form.name }}<br>
+            {{ update_form.surname }}<br>
+            {{ update_form.password }}<br>
+            {{ update_form.password_check }}<br>
+            {{ update_form.email }}<br>
+            {{ update_form.class_id }}<br>
+            {{ update_form.mother_id }}<br>
+            {{ update_form.father_id }}<br>
+            {{ update_form.score }}<br>
+            {{ update_form.submit }}
         </form>
     {% endif %}
 {% endblock %}

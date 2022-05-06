@@ -1,10 +1,77 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "/admin/base.html" %}
 
-</body>
-</html>
+{% block title %}
+    {% if new_form is defined %}
+        New class
+    {% elif update_form is defined %}
+        Edit {{ class.student_user_data.name }}{{ class.student_user_data.surname }}
+    {% else %}
+        Students
+    {% endif %}
+{% endblock %}
+
+{% block main %}
+    <table border="1">
+        <tr>
+            <td>ID</td>
+            <td>Название</td>
+            <td>классный руководитель</td>
+            <td>расписание</td>
+            <td>школа</td>
+            <td>ученики</td>
+            <td>уроки</td>
+        </tr>
+        {% for class in classes %}
+        <tr>
+            <td>
+                <a href="{{ url_for('admin_panel_students', id=class.id) }}">{{ class.id }}</a>
+            </td>
+            <td>{{ class.number }}{{ class.symbol }}</td>
+            <td><a href="{{ url_for('admin_panel_teachers', filter=class.manager) }}">{{ class.student_class_data.number }}{{ class.student_class_data.symbol }}</a></td>
+            <td>
+                <a href="{{ url_for('admin_panel_timetable', filter=class.id) }}">оценки</a>
+            </td>
+            <td>
+                <a href="{{ url_for('admin_panel_parents', id=class.mother.id) }}">Мама</a><br>
+                <a href="{{ url_for('admin_panel_parents', id=class.father.id) }}">папа</a>
+            </td>
+            <td>
+                <a href="{{ url_for('admin_panel_achievements', filter=class.id) }}"></a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    <div>
+        <a href="{{ url_for('admin_panel_students_new') }}">Новый ученик</a>
+    </div>
+{% endblock %}
+{% block new %}
+    {% if new_form is defined %}
+        <form action="{{ url_for('admin_panel_students_new') }}" method="post">
+            {% for error in new_form.form_errors %}
+                <p>{{ error }}</p>
+            {% endfor %}
+            {{ new_form.csrf_token }}
+            {{ new_form.number }}<br>
+            {{ new_form.symbol }}<br>
+            {{ new_form.class_manger_id }}<br>
+            {{ new_form.school_id }}<br>
+            {{ new_form.submit }}
+        </form>
+    {% endif %}
+{% endblock %}
+{% block update %}
+    {% if update_form is defined %}
+        <form action="{{ url_for('admin_panel_students', id=class.id) }}" method="post">
+            {% for error in update_form.errors %}
+                <p>{{ error }}</p>
+            {% endfor %}
+            {{ update_form.csrf_token }}
+            {{ new_form.number }}<br>
+            {{ new_form.symbol }}<br>
+            {{ new_form.class_manger_id }}<br>
+            {{ new_form.school_id }}<br>
+            {{ update_form.submit }}
+        </form>
+    {% endif %}
+{% endblock %}

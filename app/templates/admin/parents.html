@@ -1,10 +1,81 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "/admin/base.html" %}
 
-</body>
-</html>
+{% block title %}
+    {% if new_form is defined %}
+        New parent
+    {% elif update_form is defined %}
+        Edit {{ parent.parent_user_data.name }}{{ parent.parent_user_data.surname }}
+    {% else %}
+        Students
+    {% endif %}
+{% endblock %}
+
+{% block main %}
+    <table border="1">
+        <tr>
+            <td>ID</td>
+            <td>ФИ</td>
+            <td>дети</td>
+        </tr>
+        {% for mother in mothers %}
+        <tr>
+            <td>
+                <a href="{{ url_for('admin_panel_parents', id=mother.id) }}">{{ mother.id }}</a>
+            </td>
+            <td>{{ mother.mother_user_data.surname }} {{ mother.mother_user_data.name }}</td>
+            <td>
+                <a href="{{ url_for('admin_panel_students', filter=mother.id) }}">дети</a>
+            </td>
+        </tr>
+        {% endfor %}
+        {% for father in fathers %}
+        <tr>
+            <td>
+                <a href="{{ url_for('admin_panel_parents', id=father.id) }}">{{ father.id }}</a>
+            </td>
+            <td>{{ father.father_user_data.surname }} {{ father.father_user_data.name }}</td>
+            <td>
+                <a href="{{ url_for('admin_panel_students', filter=father.id) }}">дети</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    <div>
+        <a href="{{ url_for('admin_panel_parents_new') }}">Новый родитель</a>
+    </div>
+{% endblock %}
+{% block new %}
+    {% if new_form is defined %}
+        <form action="{{ url_for('admin_panel_parents_new') }}" method="post">
+            {% for error in new_form.form_errors %}
+                <p>{{ error }}</p>
+            {% endfor %}
+            {{ new_form.csrf_token }}
+            {{ new_form.authorization_code }}<br>
+            {{ new_form.name }}<br>
+            {{ new_form.surname }}<br>
+            {{ new_form.password }}<br>
+            {{ new_form.password_check }}<br>
+            {{ new_form.email }}<br>
+            {{ new_form.type }}<br>
+            {{ new_form.submit }}
+        </form>
+    {% endif %}
+{% endblock %}
+{% block update %}
+    {% if update_form is defined %}
+        <form action="{{ url_for('admin_panel_parents', id=parent.id) }}" method="post">
+            {% for error in update_form.errors %}
+                <p>{{ error }}</p>
+            {% endfor %}
+            {{ update_form.csrf_token }}
+            {{ update_form.name }}<br>
+            {{ update_form.surname }}<br>
+            {{ update_form.password }}<br>
+            {{ update_form.password_check }}<br>
+            {{ update_form.email }}<br>
+            {{ update_form.type }}<br>
+            {{ update_form.submit }}
+        </form>
+    {% endif %}
+{% endblock %}

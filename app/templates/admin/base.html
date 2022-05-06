@@ -10,13 +10,15 @@
     </title>
 </head>
 <body>
-    {% block main %}
-
-    {% endblock %}
     {% block new %}
 
     {% endblock %}
+    {% block update %}
 
+    {% endblock %}
+    {% block main %}
+
+    {% endblock %}
     <br>
     <a href="{{ url_for('admin_panel_students') }}">Редактировать список учеников</a><br>
     <a href="{{ url_for('admin_panel_parents') }}">Редактировать список родителей</a><br>

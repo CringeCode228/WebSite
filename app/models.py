@@ -24,18 +24,20 @@ class User(db.Model, UserMixin):
     surname = sqlalchemy.Column(sqlalchemy.String(32), nullable=False)
     password = sqlalchemy.Column(sqlalchemy.String(102), nullable=False)
     email = sqlalchemy.Column(sqlalchemy.String(255), unique=True)
-    type = sqlalchemy.Column(sqlalchemy.Integer, nullable=False)  # 0 - student, 1 - parent, 2 - teacher, 3 - admin
+
+    # 0 - student, 1 - mother, 2 - father, 3 - teacher, 4 - admin
+    type = sqlalchemy.Column(sqlalchemy.Integer, nullable=False)
 
     students = db.relationship('Student', backref='student_user_data', lazy='dynamic')
-    mothers = db.relationship('Mother', backref='parent_user_data', lazy='dynamic')
-    fathers = db.relationship('Father', backref='parent_user_data', lazy='dynamic')
+    mothers = db.relationship('Mother', backref='mother_user_data', lazy='dynamic')
+    fathers = db.relationship('Father', backref='father_user_data', lazy='dynamic')
     teachers = db.relationship('Teacher', backref='teacher_user_data', lazy='dynamic')
     admins = db.relationship('Admin', backref='admin_user_data', lazy='dynamic')
 
-    def __init__(self, authorization_code, name, surename, password, user_type, email=None):
+    def __init__(self, authorization_code, name, surname, password, user_type, email=None):
         self.authorization_code = authorization_code
         self.name = name
-        self.surname = surename
+        self.surname = surname
         self.set_password(password)
         self.email = email
         self.type = user_type
@@ -56,7 +58,7 @@ class User(db.Model, UserMixin):
 class Student(db.Model):
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
     user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("user.id"), nullable=False)
-    class_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("class.id"), nullable=False)
+    class_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("class.id"))
     mother_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("mother.id"))
     father_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("father.id"))
     score = sqlalchemy.Column(sqlalchemy.Integer, nullable=False, default=0)
@@ -68,6 +70,9 @@ class Student(db.Model):
         self.user_id = user_id
         self.class_id = class_id
 
+    def __repr__(self):
+        return f"{self.student_user_data.name} {self.student_user_data.surname}"
+
 
 class Mother(db.Model):
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
@@ -77,6 +82,9 @@ class Mother(db.Model):
 
     def __init__(self, user_id):
         self.user_id = user_id
+
+    def __repr__(self):
+        return f"{self.mother_user_data.surname} {self.mother_user_data.name}"
 
 
 class Father(db.Model):
@@ -88,21 +96,31 @@ class Father(db.Model):
     def __init__(self, user_id):
         self.user_id = user_id
 
+    def __repr__(self):
+        return f"{self.father_user_data.surname} {self.father_user_data.name}"
+
 
 class Teacher(db.Model):
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
     user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("user.id"))
 
     lessons = orm.relationship('Lesson', backref='teacher', lazy='dynamic')
+    class_ = orm.relationship('Class', backref='manager', uselist=False)
 
     def __init__(self, user_id):
         self.user_id = user_id
+
+    def __repr__(self):
+        return f"{self.father_user_data.surname} {self.father_user_data.name}"
 
 
 class Admin(db.Model):
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
     user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("user.id"))
-    school_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("school.id"))
+    # school_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("school.id"))
+
+    def __init__(self, user_id):
+        self.user_id = user_id
 
 
 class Subject(db.Model):
@@ -110,9 +128,13 @@ class Subject(db.Model):
     name = sqlalchemy.Column(sqlalchemy.String(32), nullable=False)
 
     textbooks = orm.relationship('Textbook', backref='subject', lazy='dynamic')
+    lessons = orm.relationship('Lesson', backref='subject', lazy='dynamic')
 
     def __init__(self, name):
         self.name = name
+
+    def __repr__(self):
+        return self.name
 
 
 class Lesson(db.Model):
@@ -120,10 +142,13 @@ class Lesson(db.Model):
     subject_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("subject.id"), nullable=False)
     datetime = sqlalchemy.Column(sqlalchemy.DateTime, nullable=False)
     duration = sqlalchemy.Column(sqlalchemy.Integer, nullable=False, default=45)
-    teacher_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("teacher.id"), nullable=False)
-    cabinet = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("cabinet.id"), nullable=False)
+    class_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("class.id"))
+    teacher_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("teacher.id"))
+    cabinet_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("cabinet.id"))
     missing_students = sqlalchemy.Column(sqlalchemy.String(255))
     homework = sqlalchemy.Column(sqlalchemy.Text(1000))
+
+    rates = orm.relationship("Rate", backref="lesson", lazy="dynamic")
 
     def __init__(self, subject_id, datetime, duration, teacher_id, cabinet):
         self.subject_id = subject_id
@@ -132,14 +157,27 @@ class Lesson(db.Model):
         self.teacher_id = teacher_id
         self.cabinet = cabinet
 
+    def __repr__(self):
+        return f"Lesson '{self.subject.name}' with {self.lesson_class_data.number}{self.lesson_class_data.symbol} " \
+               f"at {self.datetime} in cabinet №{self.lesson_cabinet_data.number}"
+
 
 class Cabinet(db.Model):
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
     number = sqlalchemy.Column(sqlalchemy.Integer, nullable=False)
     name = sqlalchemy.Column(sqlalchemy.String(32))
 
-    def __init__(self, number):
+    lessons = orm.relationship('Lesson', backref='lesson_cabinet_data', lazy='dynamic')
+
+    def __init__(self, number, name):
         self.number = number
+        self.name = name
+
+    def __repr__(self):
+        if self.name:
+            return f"{self.number}"
+        else:
+            return f"{self.name} №{self.number}"
 
 
 class Rate(db.Model):
@@ -153,19 +191,29 @@ class Rate(db.Model):
         self.student_id = student_id
         self.lesson_id = lesson_id
 
+    def __repr__(self):
+        return f"Rate {self.rate} by {self.student.student_user_data.name} {self.student.student_user_data.surname}" \
+               f"at {self.lesson.subject.name}"
+
 
 class Class(db.Model):
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
     number = sqlalchemy.Column(sqlalchemy.Integer, nullable=False)
     symbol = sqlalchemy.Column(sqlalchemy.String(1), nullable=False)
-    class_manager_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("teacher.id"), nullable=False)
+    class_manager_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("teacher.id"))
     timetable_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("timetable.id"))
-    students = orm.relationship('Student', backref='class', lazy='dynamic')
+    school_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("school.id"))
+
+    students = orm.relationship('Student', backref='student_class_data', lazy='dynamic')
+    lessons = orm.relationship('Lesson', backref='lesson_class_data', lazy='dynamic')
 
     def __init__(self, number, symbol, class_manager_id):
         self.number = max(min(number, 11), 1)
         self.symbol = symbol
         self.class_manager_id = class_manager_id
+
+    def __repr__(self):
+        return f"{self.number}{self.symbol} school №{self.school.number}"
 
 
 class School(db.Model):
@@ -173,7 +221,8 @@ class School(db.Model):
     number = sqlalchemy.Column(sqlalchemy.Integer, nullable=False)
     name = sqlalchemy.Column(sqlalchemy.String(120))
 
-    admins = orm.relationship('Admin', backref='school', lazy='dynamic')
+    # admins = orm.relationship('Admin', backref='school', lazy='dynamic')
+    classes = orm.relationship('Class', backref='school', lazy='dynamic')
 
     def __init__(self, number, name=None):
         self.number = number
