@@ -39,16 +39,17 @@ def admin_panel():
 
 
 @application.route("/admin_panel/students")
+@roles_required(Role.Admin)
 def admin_panel_students():
     return render_template("admin/students.html", students=parse_filter(models.Student))
 
 
 @application.route("/admin_panel/students/new", methods=["GET", "POST"])
+@roles_required(Role.Admin)
 def admin_panel_students_new():
     new_form = forms.AdminRegistrationStudentForm()
     if new_form.validate_on_submit():
-        user = models.User(new_form.authorization_code.data, new_form.name.data, new_form.surname.data, 
-                           new_form.password.data, 0, new_form.email.data)
+        user = models.User(new_form.name.data, new_form.surname.data, new_form.password.data, 0, new_form.email.data)
         db.session.add(user)
         db.session.commit()
         student = models.Student(user.id_)
@@ -59,6 +60,7 @@ def admin_panel_students_new():
 
 
 @application.route("/admin_panel/students/<id_>", methods=["GET", "POST"])
+@roles_required(Role.Admin)
 def admin_panel_students_update(id_):
     update_form = forms.AdminUpdateStudentForm()
     current_student = models.Student.query.filter_by(id=id_).first()
@@ -81,27 +83,36 @@ def admin_panel_students_update(id_):
                            current_student=current_student, update_form=update_form)
 
 
+@application.route("/admin_panel/students/<id_>/remove", methods=["GET", "POST"])
+@roles_required(Role.Admin)
+def admin_panel_students_remove(id_):
+    user = models.Student.query.filter_by(id_=id_).delete()
+    return redirect(url_for("admin_panel_student"))
+
+
 @application.route("/admin_panel/parents")
+@roles_required(Role.Admin)
 def admin_panel_parents():
     return render_template("admin/parents.html", mothers=parse_filter(models.Mother),
                            fathers=parse_filter(models.Father))
 
 
 @application.route("/admin_panel/parents/new", methods=["GET", "POST"])
+@roles_required(Role.Admin)
 def admin_panel_parents_new():
     new_form = forms.AdminRegistrationParentForm()
     if new_form.validate_on_submit():
         if new_form.type.data == "mother":
-            user = models.User(new_form.authorization_code.data, new_form.name.data, new_form.surname.data,
-                               new_form.password.data, 1, new_form.email.data)
+            user = models.User(new_form.name.data, new_form.surname.data, new_form.password.data, 1,
+                               new_form.email.data)
             db.session.add(user)
             db.session.commit()
             mother = models.Mother(user.id_)
             db.session.add(mother)
             db.session.commit()
         elif new_form.type.data == "father":
-            user = models.User(new_form.authorization_code.data, new_form.name.data, new_form.surname.data,
-                               new_form.password.data, 2, new_form.email.data)
+            user = models.User(new_form.name.data, new_form.surname.data, new_form.password.data, 2,
+                               new_form.email.data)
             db.session.add(user)
             db.session.commit()
             father = models.Father(user.id_)
@@ -113,6 +124,7 @@ def admin_panel_parents_new():
 
 
 @application.route("/admin_panel/mothers/mothers/<id_>", methods=["GET", "POST"])
+@roles_required(Role.Admin)
 def admin_panel_mothers_update(id_):
     update_form = forms.AdminUpdateParentForm()
     current_mother = models.Mother.query.filter_by(id=id_).first()
@@ -132,6 +144,7 @@ def admin_panel_mothers_update(id_):
 
 
 @application.route("/admin_panel/parents/fathers/<id_>", methods=["GET", "POST"])
+@roles_required(Role.Admin)
 def admin_panel_fathers_update(id_):
     update_form = forms.AdminUpdateParentForm()
     current_father = models.Father.query.filter_by(id=id_).first()
@@ -151,16 +164,17 @@ def admin_panel_fathers_update(id_):
 
 
 @application.route("/admin_panel/teachers")
+@roles_required(Role.Admin)
 def admin_panel_teachers():
     return render_template("admin/parents.html", teachers=parse_filter(models.Teacher))
 
 
 @application.route("/admin_panel/teachers/new", methods=["GET", "POST"])
+@roles_required(Role.Admin)
 def admin_panel_teachers_new():
     new_form = forms.AdminRegistrationForm()
     if new_form.validate_on_submit():
-        user = models.User(new_form.authorization_code.data, new_form.name.data, new_form.surname.data,
-                           new_form.password.data, 1, new_form.email.data)
+        user = models.User(new_form.name.data, new_form.surname.data, new_form.password.data, 1, new_form.email.data)
         db.session.add(user)
         db.session.commit()
         teacher = models.Teacher(user.id_)
@@ -170,6 +184,7 @@ def admin_panel_teachers_new():
 
 
 @application.route("/admin_panel/teachers/<id_>", methods=["GET", "POST"])
+@roles_required(Role.Admin)
 def admin_panel_teachers_update(id_):
     update_form = forms.AdminUpdateForm()
     current_teacher = models.Teacher.query.filter_by(id=id_).first()
@@ -189,15 +204,17 @@ def admin_panel_teachers_update(id_):
 
 
 @application.route("/admin_panel/classes")
+@roles_required(Role.Admin)
 def admin_panel_classes():
     return render_template("admin/classes.html", classes=parse_filter(models.Class))
 
 
 @application.route("/admin_panel/classes/new", methods=["GET", "POST"])
+@roles_required(Role.Admin)
 def admin_panel_classes_new():
     new_form = forms.AdminRegistrationClassForm()
     if new_form.validate_on_submit():
-        class_ = models.Class(new_form.number, new_form.symbol, new_form.class_manager_id)
+        class_ = models.Class(new_form.number.data, new_form.symbol.data, new_form.class_manager_id.data)
         db.session.add(class_)
         db.session.commit()
         return redirect(url_for('admin_panel_classes'))
@@ -205,10 +222,15 @@ def admin_panel_classes_new():
 
 
 @application.route("/admin_panel/classes/<id_>", methods=["GET", "POST"])
+@roles_required(Role.Admin)
 def admin_panel_classes_update(id_):
     update_form = forms.AdminUpdateClassForm()
     current_class = models.Class.query.filter_by(id=id_).first()
     if update_form.validate_on_submit():
+        current_class.number = set_field(update_form.number.data, current_class.number)
+        current_class.symbol = set_field(update_form.symbol.data, current_class.symbol)
+        current_class.school = set_field(update_form.school_id.data, current_class.school)
+        current_class.manager = set_field(update_form.class_manager_id.data, current_class.manager)
         db.session.commit()
         return redirect(url_for('admin_panel_classes'))
     return render_template("admin/classes.html", classs=models.Class.query.all(), current_class=current_class,
@@ -216,15 +238,17 @@ def admin_panel_classes_update(id_):
 
 
 @application.route("/admin_panel/subjects")
+@roles_required(Role.Admin)
 def admin_panel_subjects():
     return render_template("admin/subjects.html", subjects=parse_filter(models.Subject))
 
 
 @application.route("/admin_panel/subjects/new")
+@roles_required(Role.Admin)
 def admin_panel_subjects_new():
     new_form = forms.AdminRegistrationSubjectForm()
     if new_form.validate_on_submit():
-        subject = models.Subject(new_form.name)
+        subject = models.Subject(new_form.name.data)
         db.session.add(subject)
         db.session.commit()
         return redirect(url_for('admin_panel_subjects'))
@@ -232,10 +256,12 @@ def admin_panel_subjects_new():
 
 
 @application.route("/admin_panel/subjects/<id_>")
+@roles_required(Role.Admin)
 def admin_panel_subjects_update(id_):
     update_form = forms.AdminUpdateStudentForm()
     current_subject = models.Subject.query.filter_by(id=id_).first()
     if update_form.validate_on_submit():
+        current_subject.name = set_field(update_form.name.data, current_subject.name)
         db.session.commit()
         return redirect(url_for('admin_panel_subjects'))
     return render_template("admin/subjects.html", subjects=models.Subject.query.all(), current_subject=current_subject,
@@ -243,15 +269,17 @@ def admin_panel_subjects_update(id_):
 
 
 @application.route("/admin_panel/lessons")
+@roles_required(Role.Admin)
 def admin_panel_lessons():
     return render_template("admin/lessons.html", lessons=parse_filter(models.Lesson))
 
 
 @application.route("/admin_panel/lessons/new")
+@roles_required(Role.Admin)
 def admin_panel_lessons_new():
     new_form = forms.AdminRegistrationClassForm()
     if new_form.validate_on_submit():
-        class_ = models.Class(new_form.number, new_form.symbol, new_form.class_manager_id)
+        class_ = models.Class(new_form.number.data, new_form.symbol.data, new_form.class_manager_id.data)
         db.session.add(class_)
         db.session.commit()
         return redirect(url_for('admin_panel_lessons'))
@@ -259,10 +287,16 @@ def admin_panel_lessons_new():
 
 
 @application.route("/admin_panel/lessons/<id_>")
+@roles_required(Role.Admin)
 def admin_panel_lessons_update(id_):
     update_form = forms.AdminUpdateLessonForm()
     current_lesson = models.Lesson.query.filter_by(id=id_).first()
     if update_form.validate_on_submit():
+        current_lesson.subject = set_field(update_form.subject_id.data, current_lesson.subject)
+        current_lesson.datetime = set_field(update_form.datetime.data, current_lesson.datetime)
+        current_lesson.duration = set_field(update_form.duration.data, current_lesson.duration)
+        current_lesson.teacher = set_field(update_form.teacher_id.data, current_lesson.teacher)
+        current_lesson.lesson_cabinet_data = set_field(update_form.cabinet_id.data, current_lesson.lesson_cabinet_data)
         db.session.commit()
         return redirect(url_for('admin_panel_lessons'))
     return render_template("admin/lessons.html", lessons=models.Lesson.query.all(), current_lesson=current_lesson,
@@ -270,26 +304,31 @@ def admin_panel_lessons_update(id_):
 
 
 @application.route("/admin_panel/timetable")
+@roles_required(Role.Admin)
 def admin_panel_timetable():
     return render_template("admin/timetable.html", timetables=parse_filter(models.Timetable))
 
 
 @application.route("/admin_panel/timetable/new")
+@roles_required(Role.Admin)
 def admin_panel_timetable_new():
     return "Page"
 
 
 @application.route("/admin_panel/timetable/<id_>")
+@roles_required(Role.Admin)
 def admin_panel_timetable_update(id_):
     return "Page"
 
 
 @application.route("/admin_panel/cabinets")
+@roles_required(Role.Admin)
 def admin_panel_cabinets():
     return render_template("admin/cabinets.html", cabinets=parse_filter(models.Cabinet))
 
 
 @application.route("/admin_panel/cabinets/new")
+@roles_required(Role.Admin)
 def admin_panel_cabinets_new():
     new_form = forms.AdminRegistrationCabinetForm()
     if new_form.validate_on_submit():
@@ -301,10 +340,13 @@ def admin_panel_cabinets_new():
 
 
 @application.route("/admin_panel/cabinets/<id_>")
+@roles_required(Role.Admin)
 def admin_panel_cabinets_update(id_):
     update_form = forms.AdminUpdateCabinetForm()
     current_cabinet = models.Cabinet.query.filter_by(id=id_).first()
     if update_form.validate_on_submit():
+        current_cabinet.number = set_field(update_form.number.data, current_cabinet.number)
+        current_cabinet.name = set_field(update_form.name.data, current_cabinet.name)
         db.session.commit()
         return redirect(url_for('admin_panel_cabinets'))
     return render_template("admin/cabinets.html", cabinets=models.Cabinet.query.all(), current_cabinet=current_cabinet,
@@ -312,11 +354,13 @@ def admin_panel_cabinets_update(id_):
 
 
 @application.route("/admin_panel/rates")
+@roles_required(Role.Admin)
 def admin_panel_rates():
     return render_template("admin/rates.html", rates=parse_filter(models.Rate))
 
 
 @application.route("/admin_panel/rates/new")
+@roles_required(Role.Admin)
 def admin_panel_rates_new():
     new_form = forms.AdminRegistrationRateForm()
     if new_form.validate_on_submit():
@@ -328,10 +372,13 @@ def admin_panel_rates_new():
 
 
 @application.route("/admin_panel/rates/<id_>")
+@roles_required(Role.Admin)
 def admin_panel_rates_update(id_):
     update_form = forms.AdminUpdateRateForm()
     current_rate = models.Rate.query.filter_by(id=id_).first()
     if update_form.validate_on_submit():
+        current_rate.rate = set_field(update_form.rate.data, current_rate.rate)
+        current_rate.lesson = set_field(update_form.lesson_id.data, current_rate.lesson)
         db.session.commit()
         return redirect(url_for('admin_panel_rates'))
     return render_template("admin/rates.html", rates=models.Rate.query.all(), current_rate=current_rate,
@@ -339,15 +386,17 @@ def admin_panel_rates_update(id_):
 
 
 @application.route("/admin_panel/textbooks")
+@roles_required(Role.Admin)
 def admin_panel_textbooks():
     return render_template("admin/textbooks.html", textbooks=parse_filter(models.Textbook))
 
 
 @application.route("/admin_panel/textbooks/new")
+@roles_required(Role.Admin)
 def admin_panel_textbooks_new():
     new_form = forms.AdminRegistrationTextbookForm()
     if new_form.validate_on_submit():
-        textbook = models.Textbook(new_form.subject_id, new_form.class_number, new_form.link)
+        textbook = models.Textbook(new_form.subject_id.data, new_form.class_number.data, new_form.link.data)
         db.session.add(textbook)
         db.session.commit()
         return redirect(url_for('admin_panel_textbooks'))
@@ -355,10 +404,14 @@ def admin_panel_textbooks_new():
 
 
 @application.route("/admin_panel/textbooks/<id_>")
+@roles_required(Role.Admin)
 def admin_panel_textbooks_update(id_):
     update_form = forms.AdminUpdateTextbookForm()
     current_textbook = models.Textbook.query.filter_by(id=id_).first()
     if update_form.validate_on_submit():
+        current_textbook.subject = set_field(update_form.subject_id.data, current_textbook.subject)
+        current_textbook.class_number = set_field(update_form.class_number.data, current_textbook.class_number)
+        current_textbook.link = set_field(update_form.link.data, current_textbook.link)
         db.session.commit()
         return redirect(url_for('admin_panel_textbooks'))
     return render_template("admin/textbooks.html", textbooks=models.Textbook.query.all(),
@@ -366,15 +419,17 @@ def admin_panel_textbooks_update(id_):
 
 
 @application.route("/admin_panel/achievements")
+@roles_required(Role.Admin)
 def admin_panel_achievements():
     return render_template("admin/achievements.html", achievements=parse_filter(models.Achievement))
 
 
 @application.route("/admin_panel/achievements/new")
+@roles_required(Role.Admin)
 def admin_panel_achievements_new():
     new_form = forms.AdminRegistrationAchievementForm()
     if new_form.validate_on_submit():
-        achievement = models.Achievement(new_form.name, new_form.text, new_form.score)
+        achievement = models.Achievement(new_form.name.data, new_form.text.data, new_form.score.data)
         db.session.add(achievement)
         db.session.commit()
         return redirect(url_for('admin_panel_achievement'))
@@ -382,10 +437,14 @@ def admin_panel_achievements_new():
 
 
 @application.route("/admin_panel/achievements/<id_>")
+@roles_required(Role.Admin)
 def admin_panel_achievements_update(id_):
     update_form = forms.AdminUpdateAchievementForm()
     current_achievement = models.Achievement.query.filter_by(id=id_).first()
     if update_form.validate_on_submit():
+        current_achievement.name = set_field(update_form.name.data, current_achievement.name)
+        current_achievement.text = set_field(update_form.text.data, current_achievement.text)
+        current_achievement.score = set_field(update_form.name.data, current_achievement.score)
         db.session.commit()
         return redirect(url_for('admin_panel_achievements'))
     return render_template("admin/achievements.html", acievements=models.Achievement.query.all(), 

@@ -22,7 +22,7 @@ def login():
     form = forms.LoginForm()
     if form.validate_on_submit():
         user = models.User.query.filter_by(id_=form.id_.data).first()
-        if user is None or not user.authorization_code != -1:
+        if user is None:
             print("User not found")
             flash('User not found')
             return redirect(url_for('login'))
@@ -33,19 +33,6 @@ def login():
         login_user(user, remember=True)
         return redirect(url_for('index'))
     return render_template("/authorization/login.html", user=current_user, form=form)
-
-
-@application.route("/activate")
-def authorization():
-    form = forms.AuthorizationForm()
-    if form.validate_on_submit():
-        user = models.User.query.filter_by(authorization_code=form.authorization_code.data).first()
-        if user is None:
-            flash('User with this code not found')
-            return redirect(url_for('authorization'))
-        password = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(8))
-        return redirect(url_for('index'))
-    return render_template("/authorization/registration.html", form=form)
 
 
 @application.route("/logout")

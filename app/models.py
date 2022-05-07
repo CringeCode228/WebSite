@@ -20,7 +20,6 @@ student_achievement = sqlalchemy.Table('student_achievement',
 
 class User(db.Model, UserMixin):
     id_ = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
-    authorization_code = sqlalchemy.Column(sqlalchemy.Integer, unique=True, nullable=False)
     name = sqlalchemy.Column(sqlalchemy.String(32), nullable=False)
     surname = sqlalchemy.Column(sqlalchemy.String(32), nullable=False)
     password = sqlalchemy.Column(sqlalchemy.String(102), nullable=False)
@@ -35,20 +34,12 @@ class User(db.Model, UserMixin):
     teachers = db.relationship('Teacher', backref='teacher_user_data', lazy='dynamic')
     admins = db.relationship('Admin', backref='admin_user_data', lazy='dynamic')
 
-    def __init__(self, authorization_code, name, surname, password, user_type, email=None):
-        self.authorization_code = authorization_code
+    def __init__(self, name, surname, password, user_type, email=None):
         self.name = name
         self.surname = surname
         self.set_password(password)
         self.email = email
         self.type = user_type
-
-    def authorization(self, authorization_code):
-        if authorization_code == self.authorization_code:
-            self.authorization_code = -1
-            return True
-        else:
-            return False
 
     def __repr__(self):
         return "<User {}>".format(self.username)
