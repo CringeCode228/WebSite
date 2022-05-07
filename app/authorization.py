@@ -10,28 +10,40 @@ from werkzeug.security import generate_password_hash
 import random
 from flask_login import login_required
 from app import no_cache
+from app import db
+from flask_user.user_manager import UserManager
+from flask import abort
+import random, string
 
 
 @application.route("/login", methods=["GET", "POST"])
 def login():
+    print(current_user)
     form = forms.LoginForm()
     if form.validate_on_submit():
-        user = models.User.query.filter_by(username=form.username.data).first()
-        if user is None or not user.check_password(form.password.data):
-            flash('Invalid username or password')
+        user = models.User.query.filter_by(id_=form.id_.data).first()
+        if user is None or not user.authorization_code != -1:
+            print("User not found")
+            flash('User not found')
+            return redirect(url_for('login'))
+        elif not user.check_password(form.password.data):
+            print("Invalid password")
+            flash('Invalid password')
             return redirect(url_for('login'))
         login_user(user, remember=True)
         return redirect(url_for('index'))
-    return render_template("/authorization/login.html", user=current_user, form=form, unic_id=random.random())
+    return render_template("/authorization/login.html", user=current_user, form=form)
 
 
-@application.route("/registration")
-def registration():
-    form = forms.RegistrationForm()
+@application.route("/activate")
+def authorization():
+    form = forms.AuthorizationForm()
     if form.validate_on_submit():
-        user = models.User(form.username, form.password, form.email, models.Role.default)
-        db.session.add(user)
-        db.session.commit()
+        user = models.User.query.filter_by(authorization_code=form.authorization_code.data).first()
+        if user is None:
+            flash('User with this code not found')
+            return redirect(url_for('authorization'))
+        password = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(8))
         return redirect(url_for('index'))
     return render_template("/authorization/registration.html", form=form)
 
@@ -51,3 +63,12 @@ def profile():
 @loginManager.user_loader
 def load_user(user_id):
     return models.User.query.get(int(user_id))
+
+
+class MyUserManager(UserManager):
+
+    def unauthenticated_view(self):
+        return abort(404)
+
+
+userManager = MyUserManager(application, db, models.User)

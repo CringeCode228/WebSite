@@ -23,19 +23,19 @@
         {% for student in students %}
         <tr>
             <td>
-                <a href="{{ url_for('admin_panel_students_update', id=student.id) }}">{{ student.id }}</a>
+                <a href="{{ url_for('admin_panel_students_update', id_=student.id_) }}">{{ student.id_ }}</a>
             </td>
             <td>{{ student.student_user_data.surname }} {{ student.student_user_data.name }}</td>
-            <td><a href="{{ url_for('admin_panel_classes', id=student.student_class_data.id) }}">{{ student.student_class_data.number }}{{ student.student_class_data.symbol }}</a></td>
+            <td><a href="{{ url_for('admin_panel_classes', id_=student.student_class_data.id_) }}">{{ student.student_class_data.number }}{{ student.student_class_data.symbol }}</a></td>
             <td>
-                <a href="{{ url_for('admin_panel_rates', filter=student.id, field='id') }}">оценки</a>
+                <a href="{{ url_for('admin_panel_rates', filter=student.id_, field='id_') }}">оценки</a>
             </td>
             <td>
-                <a href="{{ url_for('admin_panel_parents', id=student.mother.id) }}">Мама</a><br>
-                <a href="{{ url_for('admin_panel_parents', id=student.father.id) }}">папа</a>
+                <a href="{{ url_for('admin_panel_parents', id_=student.mother.id_) }}">Мама</a><br>
+                <a href="{{ url_for('admin_panel_parents', id_=student.father.id_) }}">папа</a>
             </td>
             <td>
-                <a href="{{ url_for('admin_panel_achievements', filter=student.id) }}"></a>
+                <a href="{{ url_for('admin_panel_achievements', filter=student.id_) }}"></a>
             </td>
         </tr>
         {% endfor %}
@@ -66,9 +66,9 @@
 {% endblock %}
 {% block update %}
     {% if update_form is defined %}
-        <form action="{{ url_for('admin_panel_students_update', id=current_student.id) }}" method="post">
-            {% for error in update_form.errors %}
-                <p>{{ error }}</p>
+        <form action="{{ url_for('admin_panel_students_update', id_=current_student.id_) }}" method="post">
+            {% for field, error in update_form.errors.items() %}
+                <p>Error(s): {{ ", ".join(error) }}</p>
             {% endfor %}
             {{ update_form.csrf_token }}
             {{ update_form.name }}<br>

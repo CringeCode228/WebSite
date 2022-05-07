@@ -20,22 +20,22 @@
         {% for mother in mothers %}
         <tr>
             <td>
-                <a href="{{ url_for('admin_panel_parents', id=mother.id) }}">{{ mother.id }}</a>
+                <a href="{{ url_for('admin_panel_parents', id_=mother.id_) }}">{{ mother.id_ }}</a>
             </td>
             <td>{{ mother.mother_user_data.surname }} {{ mother.mother_user_data.name }}</td>
             <td>
-                <a href="{{ url_for('admin_panel_students', filter=mother.id) }}">дети</a>
+                <a href="{{ url_for('admin_panel_students', filter=mother.id_) }}">дети</a>
             </td>
         </tr>
         {% endfor %}
         {% for father in fathers %}
         <tr>
             <td>
-                <a href="{{ url_for('admin_panel_parents', id=father.id) }}">{{ father.id }}</a>
+                <a href="{{ url_for('admin_panel_parents', id_=father.id_) }}">{{ father.id_ }}</a>
             </td>
             <td>{{ father.father_user_data.surname }} {{ father.father_user_data.name }}</td>
             <td>
-                <a href="{{ url_for('admin_panel_students', filter=father.id) }}">дети</a>
+                <a href="{{ url_for('admin_panel_students', filter=father.id_) }}">дети</a>
             </td>
         </tr>
         {% endfor %}
@@ -64,7 +64,7 @@
 {% endblock %}
 {% block update %}
     {% if update_form is defined %}
-        <form action="{{ url_for('admin_panel_parents', id=parent.id) }}" method="post">
+        <form action="{{ url_for('admin_panel_parents', id_=parent.id_) }}" method="post">
             {% for error in update_form.errors %}
                 <p>{{ error }}</p>
             {% endfor %}

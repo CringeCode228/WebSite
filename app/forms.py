@@ -163,3 +163,14 @@ class AdminUpdateAchievementForm(FlaskForm):
     name = StringField("Title")
     text = StringField("Addition")
     score = IntegerField("Score")
+
+
+class LoginForm(FlaskForm):
+    id_ = IntegerField("Login", validators=[InputRequired()])
+    password = PasswordField("Password", validators=[InputRequired()])
+    submit = SubmitField("Submit")
+
+
+class AuthorizationForm(FlaskForm):
+    authorization_code = IntegerField("Activate code")
+    submit = SubmitField("Submit")

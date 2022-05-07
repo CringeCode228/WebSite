@@ -19,7 +19,7 @@
         {% for teacher in teachers %}
         <tr>
             <td>
-                <a href="{{ url_for('admin_panel_teachers', id=teacher.id) }}">{{ teacher.id }}</a>
+                <a href="{{ url_for('admin_panel_teachers', id_=teacher.id_) }}">{{ teacher.id_ }}</a>
             </td>
             <td>{{ teacher.teacher_user_data.surname }} {{ teacher.teacher_user_data.name }}</td>
         </tr>
@@ -48,7 +48,7 @@
 {% endblock %}
 {% block update %}
     {% if update_form is defined %}
-        <form action="{{ url_for('admin_panel_teachers', id=teacher.id) }}" method="post">
+        <form action="{{ url_for('admin_panel_teachers', id_=teacher.id_) }}" method="post">
             {% for error in update_form.errors %}
                 <p>{{ error }}</p>
             {% endfor %}
