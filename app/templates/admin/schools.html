@@ -1,0 +1,59 @@
+{% extends "/admin/base.html" %}
+
+{% block title %}
+    {% if new_form is defined %}
+        New school
+    {% elif update_form is defined %}
+        Edit school
+    {% else %}
+        schools
+    {% endif %}
+{% endblock %}
+
+{% block main %}
+    <table border="1">
+        <tr>
+            <td>ID</td>
+            <td>Номер</td>
+            <td>Название</td>
+        </tr>
+        {% for school in schools %}
+        <tr>
+            <td>
+                <a href="{{ url_for('admin_panel_schools_update', id_=school.id_) }}">{{ school.id_ }}</a>
+            </td>
+            <td>{{ school.number }}</td>
+            <td>{{ school.name }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <div>
+        <a href="{{ url_for('admin_panel_schools_new') }}">Новая школа</a>
+    </div>
+{% endblock %}
+{% block new %}
+    {% if new_form is defined %}
+        <form action="{{ url_for('admin_panel_schools_new') }}" method="post">
+            {% for field, error in new_form.errors.items() %}
+                <p>Error(s): {{ ", ".join(error) }}</p>
+            {% endfor %}
+            {{ new_form.csrf_token }}
+            {{ new_form.number }}<br>
+            {{ new_form.name }}<br>
+            {{ new_form.submit }}
+        </form>
+    {% endif %}
+{% endblock %}
+{% block update %}
+    {% if update_form is defined %}
+        <form action="{{ url_for('admin_panel_schools_update', id_=current_school.id_) }}" method="post">
+            {% for field, error in update_form.errors.items() %}
+                <p>Error(s): {{ ", ".join(error) }}</p>
+            {% endfor %}
+            {{ update_form.csrf_token }}
+            {{ update_form.name }}<br>
+            {{ update_form.submit }}
+        </form>
+        <a href="{{ url_for('admin_panel_schools_remove', id_=current_school.id_) }}">Удалить</a>
+    {% endif %}
+{% endblock %}

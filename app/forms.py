@@ -206,3 +206,14 @@ class LoginForm(FlaskForm):
     id_ = IntegerField("Login", validators=[InputRequired()])
     password = PasswordField("Password", validators=[InputRequired()])
     submit = SubmitField("Submit")
+
+
+class AdminRegistrationSchoolForm(FlaskForm):
+    number = IntegerField("Number", validators=[InputRequired()])
+    name = StringField("Name", validators=[Optional()])
+    submit = SubmitField("Register")
+
+
+class AdminUpdateSchoolForm(FlaskForm):
+    name = StringField("Name", validators=[Optional()])
+    submit = SubmitField("Update")

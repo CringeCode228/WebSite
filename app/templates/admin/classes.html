@@ -4,9 +4,9 @@
     {% if new_form is defined %}
         New class
     {% elif update_form is defined %}
-        Edit {{ class.student_user_data.name }}{{ class.student_user_data.surname }}
+        Edit {{ current_class.number }}{{ current_class.symbol }} class
     {% else %}
-        Students
+        Classes
     {% endif %}
 {% endblock %}
 
@@ -24,10 +24,14 @@
         {% for class in classes %}
         <tr>
             <td>
-                <a href="{{ url_for('admin_panel_students', id_=class.id_) }}">{{ class.id_ }}</a>
+                <a href="{{ url_for('admin_panel_classes_update', id_=class.id_) }}">{{ class.id_ }}</a>
             </td>
             <td>{{ class.number }}{{ class.symbol }}</td>
-            <td><a href="{{ url_for('admin_panel_teachers_update', id_=class.manager.id_) }}">{{ class.student_class_data.number }}{{ class.student_class_data.symbol }}</a></td>
+            <td>
+                <a href="{{ url_for('admin_panel_teachers_update', id_=class.manager.id_) }}">
+                    {{ class.manager.teacher_user_data.surname }}{{ class.manager.teacher_user_data.symbol }}
+                </a>
+            </td>
             <td>
                 <a href="{{ url_for('admin_panel_timetable_update', id_=class.timetable.id_) }}">расписание</a>
             </td>
@@ -35,44 +39,45 @@
                 <a href="{{ url_for('admin_panel_schools_update', id_=class.school.id_) }}">школа</a><br>
             </td>
             <td>
-                <a href="{{ url_for('admin_panel_students', class_id=class.id_) }}"></a>
+                <a href="{{ url_for('admin_panel_students', class_id=class.id_) }}">ученики</a>
             </td>
             <td>
-                <a href="{{ url_for('admin_panel_lessons', class_id=class.id_) }}"></a>
+                <a href="{{ url_for('admin_panel_lessons', class_id=class.id_) }}">уроки</a>
             </td>
         </tr>
         {% endfor %}
     </table>
     <div>
-        <a href="{{ url_for('admin_panel_students_new') }}">Новый класс</a>
+        <a href="{{ url_for('admin_panel_classes_new') }}">Новый класс</a>
     </div>
 {% endblock %}
 {% block new %}
     {% if new_form is defined %}
-        <form action="{{ url_for('admin_panel_students_new') }}" method="post">
+        <form action="{{ url_for('admin_panel_classes_new') }}" method="post">
             {% for field, error in new_form.errors.items() %}
                 <p>Error(s): {{ ", ".join(error) }}</p>
             {% endfor %}
             {{ new_form.csrf_token }}
             {{ new_form.number }}<br>
             {{ new_form.symbol }}<br>
-            {{ new_form.class_manger_id_ }}<br>
-            {{ new_form.school_id_ }}<br>
+            {{ new_form.class_manager_id }}<br>
+            {{ new_form.school_id }}<br>
             {{ new_form.submit }}
         </form>
     {% endif %}
 {% endblock %}
 {% block update %}
     {% if update_form is defined %}
-        <form action="{{ url_for('admin_panel_students', id_=class.id_) }}" method="post">
+        <form action="{{ url_for('admin_panel_classes_update', id_=current_class.id_) }}" method="post">
             {% for error in update_form.errors %}
                 <p>{{ error }}</p>
             {% endfor %}
             {{ update_form.csrf_token }}
-            Текущий номер: {{ current_class.number }} {{ new_form.number }}<br>
-            {{ new_form.symbol }}<br>
-            {{ new_form.class_manger_id_ }}<br>
-            {{ new_form.school_id_ }}<br>
+            Текущий название: {{ current_class.number }}{{ current_class.symbol }}<br>
+            {{ update_form.number }}<br>
+            {{ update_form.symbol }}<br>
+            {{ update_form.class_manager_id }}<br>
+            {{ update_form.school_id }}<br>
             {{ update_form.submit }}
         </form>
     {% endif %}

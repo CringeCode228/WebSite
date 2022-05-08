@@ -26,7 +26,7 @@
                 <a href="{{ url_for('admin_panel_students_update', id_=student.id_) }}">{{ student.id_ }}</a>
             </td>
             <td>{{ student.student_user_data.surname }} {{ student.student_user_data.name }}</td>
-            <td><a href="{{ url_for('admin_panel_classes', id_=student.student_class_data.id_) }}">{{ student.student_class_data.number }}{{ student.student_class_data.symbol }}</a></td>
+            <td><a href="{{ url_for('admin_panel_classes_update', id_=student.student_class_data.id_) }}">{{ student.student_class_data.number }}{{ student.student_class_data.symbol }}</a></td>
             <td>
                 <a href="{{ url_for('admin_panel_rates', filter=student.id_, field='id_') }}">оценки</a>
             </td>

@@ -253,7 +253,8 @@ def admin_panel_classes():
 def admin_panel_classes_new():
     new_form = forms.AdminRegistrationClassForm()
     if new_form.validate_on_submit():
-        class_ = models.Class(new_form.number.data, new_form.symbol.data, new_form.class_manager_id.data)
+        class_ = models.Class(new_form.number.data, new_form.symbol.data, new_form.class_manager_id.data,
+                              new_form.school_id.data)
         db.session.add(class_)
         db.session.commit()
         return redirect(url_for('admin_panel_classes'))
@@ -565,3 +566,42 @@ def admin_panel_achievements_remove(id_):
     models.Achievement.query.filter_by(id_=id_).delete()
     db.session.commit()
     return redirect(url_for("admin_panel_achievements"))
+
+
+@application.route("/admin_panel/schools")
+@roles_required(Role.Admin)
+def admin_panel_schools():
+    return render_template("admin/schools.html", schools=parse_filter(models.School))
+
+
+@application.route("/admin_panel/schools/new", methods=["GET", "POST"])
+@roles_required(Role.Admin)
+def admin_panel_schools_new():
+    new_form = forms.AdminRegistrationSchoolForm()
+    if new_form.validate_on_submit():
+        school = models.School(new_form.number.data, new_form.name.data)
+        db.session.add(school)
+        db.session.commit()
+        return redirect(url_for('admin_panel_schools'))
+    return render_template("admin/schools.html", schools=models.School.query.all(), new_form=new_form)
+
+
+@application.route("/admin_panel/schools/<id_>", methods=["GET", "POST"])
+@roles_required(Role.Admin)
+def admin_panel_schools_update(id_):
+    update_form = forms.AdminUpdateSchoolForm()
+    current_school = models.School.query.filter_by(id_=id_).first()
+    if update_form.validate_on_submit():
+        current_school.name = set_field(update_form.name.data, current_school.name)
+        db.session.commit()
+        return redirect(url_for('admin_panel_schools'))
+    return render_template("admin/schools.html", acievements=models.School.query.all(),
+                           current_school=current_school, update_form=update_form)
+
+
+@application.route("/admin_panel/schools/<id_>/remove")
+@roles_required(Role.Admin)
+def admin_panel_schools_remove(id_):
+    models.School.query.filter_by(id_=id_).delete()
+    db.session.commit()
+    return redirect(url_for("admin_panel_schools"))

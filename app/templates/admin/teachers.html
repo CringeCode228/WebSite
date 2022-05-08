@@ -4,7 +4,7 @@
     {% if new_form is defined %}
         New teacher
     {% elif update_form is defined %}
-        Edit {{ teacher.teacher_user_data.name }}{{ teacher.teacher_user_data.surname }}
+        Edit {{ current_teacher.teacher_user_data.name }}{{ current_teacher.teacher_user_data.surname }}
     {% else %}
         Students
     {% endif %}
@@ -47,7 +47,7 @@
 {% endblock %}
 {% block update %}
     {% if update_form is defined %}
-        <form action="{{ url_for('admin_panel_teachers', id_=teacher.id_) }}" method="post">
+        <form action="{{ url_for('admin_panel_teachers', id_=current_teacher.id_) }}" method="post">
             {% for error in update_form.errors %}
                 <p>{{ error }}</p>
             {% endfor %}

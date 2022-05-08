@@ -228,10 +228,11 @@ class Class(db.Model):
     students = orm.relationship('Student', backref='student_class_data', lazy='dynamic')
     lessons = orm.relationship('Lesson', backref='lesson_class_data', lazy='dynamic')
 
-    def __init__(self, number, symbol, class_manager_id):
-        self.number = max(min(number, 11), 1)
+    def __init__(self, number, symbol, class_manager_id, school_id):
+        self.number = number
         self.symbol = symbol
         self.manager = class_manager_id
+        self.school = school_id
 
     def __repr__(self):
         return f"{self.number}{self.symbol} school №{self.school.number}"
@@ -245,7 +246,7 @@ class School(db.Model):
     # admins = orm.relationship('Admin', backref='school', lazy='dynamic')
     classes = orm.relationship('Class', backref='school', lazy='dynamic')
 
-    def __init__(self, number, name=None):
+    def __init__(self, number, name):
         self.number = number
         self.name = name
 
