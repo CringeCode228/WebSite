@@ -1,10 +1,71 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "/admin/base.html" %}
 
-</body>
-</html>
+{% block title %}
+    {% if new_form is defined %}
+        New rate
+    {% elif update_form is defined %}
+        Edit rate
+    {% else %}
+        rates
+    {% endif %}
+{% endblock %}
+
+{% block main %}
+    <table border="1">
+        <tr>
+            <td>ID</td>
+            <td>Ученик</td>
+            <td>оценка</td>
+            <td>урок</td>
+        </tr>
+        {% for rate in rates %}
+        <tr>
+            <td>
+                <a href="{{ url_for('admin_panel_rates_update', id_=rate.id_) }}">{{ rate.id_ }}</a>
+            </td>
+            <td>
+                <a href="{{ url_for('admin_panel_students_update', id_=rate.student.id_) }}">
+                    {{ rate.student.student_user_data.name }}{{ rate.student.student_user_data.surname }}
+                </a>
+            </td>
+            <td>
+                {{ rate.rate }}
+            </td>
+            <td>
+                <a href="{{ url_for('admin_panel_lessons_update', id_=rate.lesson.id_) }}">урок</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    <div>
+        <a href="{{ url_for('admin_panel_rates_new') }}">Новая оценка</a>
+    </div>
+{% endblock %}
+{% block new %}
+    {% if new_form is defined %}
+        <form action="{{ url_for('admin_panel_rates_new') }}" method="post">
+            {% for field, error in new_form.errors.items() %}
+                <p>Error(s): {{ ", ".join(error) }}</p>
+            {% endfor %}
+            {{ new_form.csrf_token }}
+            {{ new_form.student_id }}<br>
+            {{ new_form.rate }}<br>
+            {{ new_form.lesson_id }}<br>
+            {{ new_form.submit }}
+        </form>
+    {% endif %}
+{% endblock %}
+{% block update %}
+    {% if update_form is defined %}
+        <form action="{{ url_for('admin_panel_rates_update', id_=current_rate.id_) }}" method="post">
+            {% for field, error in update_form.errors.items() %}
+                <p>Error(s): {{ ", ".join(error) }}</p>
+            {% endfor %}
+            {{ update_form.csrf_token }}
+            {{ update_form.rate }}<br>
+            {{ update_form.lesson_id }}<br>
+            {{ update_form.submit }}
+        </form>
+        <a href="{{ url_for('admin_panel_rates_remove', id_=current_rate.id_) }}">Удалить</a>
+    {% endif %}
+{% endblock %}

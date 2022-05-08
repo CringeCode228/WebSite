@@ -11,3 +11,7 @@ SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'db_repository')
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 USER_EMAIL_SENDER_EMAIL = "example@email.com"
+
+ALLOWED_EXTENSIONS = {'pdf'}
+
+UPLOAD_FOLDER = os.path.abspath(".") + "\\app\\static\\textbooks\\"

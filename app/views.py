@@ -24,7 +24,7 @@ def simple_form():
 
 @application.errorhandler(404)
 def error404(error):
-    return render_template("error.html", error_text="Sorry, internal server error(",
+    return render_template("error.html", error_text="Sorry, page not found(",
                            error_image="images/error.png", user=current_user)
 
 

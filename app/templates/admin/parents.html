@@ -4,9 +4,13 @@
     {% if new_form is defined %}
         New parent
     {% elif update_form is defined %}
-        Edit {{ parent.parent_user_data.name }}{{ parent.parent_user_data.surname }}
+        {% if current_mother is defined %}
+            Edit {{ current_mother.mother_user_data.name }}{{ current_mother.mother_user_data.surname }}
+        {% elif current_father is defined %}
+            Edit {{ current_father.father_user_data.name }}{{ current_father.father_user_data.surname }}
+        {% endif %}
     {% else %}
-        Students
+        Parents
     {% endif %}
 {% endblock %}
 
@@ -20,22 +24,22 @@
         {% for mother in mothers %}
         <tr>
             <td>
-                <a href="{{ url_for('admin_panel_parents', id_=mother.id_) }}">{{ mother.id_ }}</a>
+                <a href="{{ url_for('admin_panel_mothers_update', id_=mother.id_) }}">{{ mother.id_ }}</a>
             </td>
             <td>{{ mother.mother_user_data.surname }} {{ mother.mother_user_data.name }}</td>
             <td>
-                <a href="{{ url_for('admin_panel_students', filter=mother.id_) }}">дети</a>
+                <a href="{{ url_for('admin_panel_students', mother_id=mother.id_) }}">дети</a>
             </td>
         </tr>
         {% endfor %}
         {% for father in fathers %}
         <tr>
             <td>
-                <a href="{{ url_for('admin_panel_parents', id_=father.id_) }}">{{ father.id_ }}</a>
+                <a href="{{ url_for('admin_panel_fathers_update', id_=father.id_) }}">{{ father.id_ }}</a>
             </td>
             <td>{{ father.father_user_data.surname }} {{ father.father_user_data.name }}</td>
             <td>
-                <a href="{{ url_for('admin_panel_students', filter=father.id_) }}">дети</a>
+                <a href="{{ url_for('admin_panel_students', father_id=father.id_) }}">дети</a>
             </td>
         </tr>
         {% endfor %}
@@ -47,8 +51,8 @@
 {% block new %}
     {% if new_form is defined %}
         <form action="{{ url_for('admin_panel_parents_new') }}" method="post">
-            {% for error in new_form.form_errors %}
-                <p>{{ error }}</p>
+            {% for field, error in new_form.errors.items() %}
+                <p>Error(s): {{ ", ".join(error) }}</p>
             {% endfor %}
             {{ new_form.csrf_token }}
             {{ new_form.name }}<br>
@@ -63,7 +67,8 @@
 {% endblock %}
 {% block update %}
     {% if update_form is defined %}
-        <form action="{{ url_for('admin_panel_parents', id_=parent.id_) }}" method="post">
+        {% if current_mother is defined %}
+        <form action="{{ url_for('admin_panel_mothers_update', id_=current_mother.id_) }}" method="post">
             {% for error in update_form.errors %}
                 <p>{{ error }}</p>
             {% endfor %}
@@ -76,5 +81,19 @@
             {{ update_form.type }}<br>
             {{ update_form.submit }}
         </form>
+        {% elif current_father is defined %}
+            <form action="{{ url_for('admin_panel_fathers_update', id_=current_father.id_) }}" method="post">
+                {% for error in update_form.errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+                {{ update_form.csrf_token }}
+                {{ update_form.name }}<br>
+                {{ update_form.surname }}<br>
+                {{ update_form.password }}<br>
+                {{ update_form.password_check }}<br>
+                {{ update_form.email }}<br>
+                {{ update_form.submit }}
+            </form>
+        {% endif %}
     {% endif %}
 {% endblock %}

@@ -82,7 +82,7 @@ class Student(db.Model):
     score = sqlalchemy.Column(sqlalchemy.Integer, nullable=False, default=0)
 
     rates = orm.relationship("Rate", backref="student", lazy='dynamic')
-    achievement = orm.relationship("Achievement", secondary=student_achievement, backref='students')
+    achievements = orm.relationship("Achievement", secondary=student_achievement, backref='students')
 
     def __init__(self, user_id, class_id=None):
         self.user_id = user_id
@@ -129,7 +129,7 @@ class Teacher(db.Model):
         self.user_id = user_id
 
     def __repr__(self):
-        return f"{self.father_user_data.surname} {self.father_user_data.name}"
+        return f"{self.teacher_user_data.surname} {self.teacher_user_data.name}"
 
 
 class Admin(db.Model):
@@ -168,16 +168,19 @@ class Lesson(db.Model):
 
     rates = orm.relationship("Rate", backref="lesson", lazy="dynamic")
 
-    def __init__(self, subject_id, datetime, duration, teacher_id, cabinet):
-        self.subject_id = subject_id
+    def __init__(self, subject_id, datetime, duration, teacher_id, cabinet_id, class_id):
+        self.subject = subject_id
         self.datetime = datetime
         self.duration = duration
-        self.teacher_id = teacher_id
-        self.cabinet = cabinet
+        self.teacher = teacher_id
+        self.lesson_cabinet_data = cabinet_id
+        self.lesson_class_data = class_id
 
     def __repr__(self):
-        return f"Lesson '{self.subject.name}' with {self.lesson_class_data.number}{self.lesson_class_data.symbol} " \
-               f"at {self.datetime} in cabinet №{self.lesson_cabinet_data.number}"
+        class_ = f"{self.lesson_class_data.number}{self.lesson_class_data.symbol}" if self.lesson_class_data \
+            else "some class"
+        return f"Lesson '{self.subject.name}' with {class_} at {self.datetime} in cabinet " \
+               f"№{self.lesson_cabinet_data.number}"
 
 
 class Cabinet(db.Model):
@@ -205,9 +208,9 @@ class Rate(db.Model):
     lesson_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("lesson.id_"), nullable=False)
 
     def __init__(self, rate, student_id, lesson_id):
-        self.rate = max(min(rate, 5), 2)
-        self.student_id = student_id
-        self.lesson_id = lesson_id
+        self.rate = rate
+        self.student = student_id
+        self.lesson = lesson_id
 
     def __repr__(self):
         return f"Rate {self.rate} by {self.student.student_user_data.name} {self.student.student_user_data.surname}" \
@@ -228,7 +231,7 @@ class Class(db.Model):
     def __init__(self, number, symbol, class_manager_id):
         self.number = max(min(number, 11), 1)
         self.symbol = symbol
-        self.class_manager_id = class_manager_id
+        self.manager = class_manager_id
 
     def __repr__(self):
         return f"{self.number}{self.symbol} school №{self.school.number}"
@@ -297,8 +300,8 @@ class Textbook(db.Model):
     class_number = sqlalchemy.Column(sqlalchemy.Integer, nullable=False)
     link = sqlalchemy.Column(sqlalchemy.String(100), nullable=False)
 
-    def __init__(self, subject_id, class_number, link):
-        self.subject_id = subject_id
+    def __init__(self, subject, class_number, link):
+        self.subject = subject
         self.class_number = max(min(class_number, 11), 1)
         self.link = link
 
@@ -313,6 +316,9 @@ class Achievement(db.Model):
         self.name = name
         self.text = text
         self.score = score
+
+    def __repr__(self):
+        return self.name
 
 
 class NotLoggedUser(AnonymousUserMixin):

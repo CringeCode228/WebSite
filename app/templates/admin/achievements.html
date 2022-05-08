@@ -2,11 +2,11 @@
 
 {% block title %}
     {% if new_form is defined %}
-        New subject
+        New achievement
     {% elif update_form is defined %}
-        Edit {{ current_subject.name }} subject
+        Edit {{ current_achievement.name }} achievement
     {% else %}
-        subjects
+        Achievements
     {% endif %}
 {% endblock %}
 
@@ -14,43 +14,51 @@
     <table border="1">
         <tr>
             <td>ID</td>
-            <td>Название</td>
+            <td>Имя</td>
+            <td>пояснение</td>
+            <td>очки</td>
         </tr>
-        {% for subject in subjects %}
+        {% for achievement in achievements %}
         <tr>
             <td>
-                <a href="{{ url_for('admin_panel_subjects_update', id_=subject.id_) }}">{{ subject.id_ }}</a>
+                <a href="{{ url_for('admin_panel_achievements_update', id_=achievement.id_) }}">{{ achievement.id_ }}</a>
             </td>
-            <td>{{ subject.name }}</td>
+            <td>{{ achievement.name }}</td>
+            <td>{{ achievement.text }}</td>
+            <td>{{ achievement.score }}</td>
         </tr>
         {% endfor %}
     </table>
     <div>
-        <a href="{{ url_for('admin_panel_subjects_new') }}">Новый предмет</a>
+        <a href="{{ url_for('admin_panel_achievements_new') }}">Новое достижение</a>
     </div>
 {% endblock %}
 {% block new %}
     {% if new_form is defined %}
-        <form action="{{ url_for('admin_panel_subjects_new') }}" method="post">
+        <form action="{{ url_for('admin_panel_achievements_new') }}" method="post">
             {% for field, error in new_form.errors.items() %}
                 <p>Error(s): {{ ", ".join(error) }}</p>
             {% endfor %}
             {{ new_form.csrf_token }}
             {{ new_form.name }}<br>
+            {{ new_form.text }}<br>
+            {{ new_form.score }}<br>
             {{ new_form.submit }}
         </form>
     {% endif %}
 {% endblock %}
 {% block update %}
     {% if update_form is defined %}
-        <form action="{{ url_for('admin_panel_subjects_update', id_=current_subject.id_) }}" method="post">
+        <form action="{{ url_for('admin_panel_achievements_update', id_=current_achievement.id_) }}" method="post">
             {% for field, error in update_form.errors.items() %}
                 <p>Error(s): {{ ", ".join(error) }}</p>
             {% endfor %}
             {{ update_form.csrf_token }}
             {{ update_form.name }}<br>
+            {{ update_form.text }}<br>
+            {{ update_form.score }}<br>
             {{ update_form.submit }}
         </form>
-        <a href="{{ url_for('admin_panel_subjects_remove', id_=current_subject.id_) }}">Удалить</a>
+        <a href="{{ url_for('admin_panel_achievements_remove', id_=current_achievement.id_) }}">Удалить</a>
     {% endif %}
 {% endblock %}

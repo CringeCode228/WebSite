@@ -31,11 +31,11 @@
                 <a href="{{ url_for('admin_panel_rates', filter=student.id_, field='id_') }}">оценки</a>
             </td>
             <td>
-                <a href="{{ url_for('admin_panel_parents', id_=student.mother.id_) }}">Мама</a><br>
-                <a href="{{ url_for('admin_panel_parents', id_=student.father.id_) }}">папа</a>
+                <a href="{{ url_for('admin_panel_mothers_update', id_=student.mother.id_) }}">Мама</a><br>
+                <a href="{{ url_for('admin_panel_fathers_update', id_=student.father.id_) }}">папа</a>
             </td>
             <td>
-                <a href="{{ url_for('admin_panel_achievements', filter=student.id_) }}"></a>
+                <a href="{{ url_for('admin_panel_students_achievements', id_=student.id_) }}">достижения</a>
             </td>
         </tr>
         {% endfor %}
@@ -47,8 +47,8 @@
 {% block new %}
     {% if new_form is defined %}
         <form action="{{ url_for('admin_panel_students_new') }}" method="post">
-            {% for error in new_form.form_errors %}
-                <p>{{ error }}</p>
+            {% for field, error in new_form.errors.items() %}
+                <p>Error(s): {{ ", ".join(error) }}</p>
             {% endfor %}
             {{ new_form.csrf_token }}
             {{ new_form.name }}<br>
@@ -79,7 +79,9 @@
             {{ update_form.mother_id }}<br>
             {{ update_form.father_id }}<br>
             {{ update_form.score }}<br>
+            {{ update_form.achievements }}<br>
             {{ update_form.submit }}
         </form>
+        <a href="{{ url_for('admin_panel_students_remove', id_=current_student.id_) }}">Удалить</a>
     {% endif %}
 {% endblock %}

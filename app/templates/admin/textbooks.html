@@ -1,10 +1,68 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "/admin/base.html" %}
 
-</body>
-</html>
+{% block title %}
+    {% if new_form is defined %}
+        New textbook
+    {% elif update_form is defined %}
+        Edit {{ current_textbook.subject.name }} textbook for grade {{ current_textbook.class_number }}
+    {% else %}
+        textbooks
+    {% endif %}
+{% endblock %}
+
+{% block main %}
+    <table border="1">
+        <tr>
+            <td>ID</td>
+            <td>Предмет</td>
+            <td>номер класса</td>
+            <td>ссылка</td>
+        </tr>
+        {% for textbook in textbooks %}
+        <tr>
+            <td><a href="{{ url_for('admin_panel_textbooks_update', id_=textbook.id_) }}">{{ textbook.id_ }}</a></td>
+            <td>
+                <a href="{{ url_for('admin_panel_subjects_update', id_=textbook.subject.id_) }}">{{ textbook.subject.name }}</a>
+            </td>
+            <td>{{ textbook.class_number }}</td>
+            <td>
+                <a href="{{ url_for('admin_panel_textbooks_download', id_=textbook.id_) }}">
+                    СКАЧАТЬ ОНЛАЙН БЕСПЛАТНО БЕЗ РЕГИСТРАЦИИ И СМС!!!
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    <div>
+        <a href="{{ url_for('admin_panel_textbooks_new') }}">Новый учебник</a>
+    </div>
+{% endblock %}
+{% block new %}
+    {% if new_form is defined %}
+        <form action="{{ url_for('admin_panel_textbooks_new') }}" method="post" enctype="multipart/form-data">
+            {% for field, error in new_form.errors.items() %}
+                <p>Error(s): {{ ", ".join(error) }}</p>
+            {% endfor %}
+            {{ new_form.csrf_token }}
+            {{ new_form.subject_id }}<br>
+            {{ new_form.class_number }}<br>
+            {{ new_form.link }}<br>
+            {{ new_form.submit }}
+        </form>
+    {% endif %}
+{% endblock %}
+{% block update %}
+    {% if update_form is defined %}
+        <form action="{{ url_for('admin_panel_textbooks_update', id_=current_textbook.id_) }}" method="post" enctype="multipart/form-data">
+            {% for field, error in update_form.errors.items() %}
+                <p>Error(s): {{ ", ".join(error) }}</p>
+            {% endfor %}
+            {{ update_form.csrf_token }}
+            {{ update_form.subject_id }}<br>
+            {{ update_form.class_number }}<br>
+            {{ update_form.link }}<br>
+            {{ update_form.submit }}
+        </form>
+        <a href="{{ url_for('admin_panel_textbooks_remove', id_=current_textbook.id_) }}">Удалить</a>
+    {% endif %}
+{% endblock %}

@@ -32,8 +32,8 @@
 {% block new %}
     {% if new_form is defined %}
         <form action="{{ url_for('admin_panel_teachers_new') }}" method="post">
-            {% for error in new_form.form_errors %}
-                <p>{{ error }}</p>
+            {% for field, error in new_form.errors.items() %}
+                <p>Error(s): {{ ", ".join(error) }}</p>
             {% endfor %}
             {{ new_form.csrf_token }}
             {{ new_form.name }}<br>

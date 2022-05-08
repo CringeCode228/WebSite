@@ -1,47 +1,25 @@
 import sqlalchemy
 from flask_wtf import FlaskForm
-from wtforms import TextAreaField, StringField, PasswordField, SubmitField, EmailField, IntegerField, \
-    FieldList, FormField, SelectField, DateTimeField, TimeField, FileField, BooleanField, RadioField
-from wtforms.validators import DataRequired, Email, EqualTo, InputRequired, Length, Optional, NumberRange
-from wtforms_sqlalchemy.fields import QuerySelectField
-from app.models import Class, Mother, Father, School, Teacher, Subject, Cabinet, Lesson, Student
+from wtforms import StringField, PasswordField, SubmitField, EmailField, IntegerField, TimeField, FileField, \
+    RadioField, DateTimeLocalField
+from wtforms.validators import DataRequired, Email, EqualTo, InputRequired, Length, Optional, NumberRange, Regexp
+from wtforms_sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
+from app.models import Class, Mother, Father, School, Teacher, Subject, Cabinet, Lesson, Student, User, Achievement
 from functools import partial
+from wtforms import ValidationError
 
 
 def get_data(class_):
     return class_.query.all()
 
 
-# def get_classes():
-#     return Class.query.all()
-#
-#
-# def get_students():
-#     return
-#
-#
-# def get_mothers():
-#     return Mother.query.all()
-#
-#
-# def get_fathers():
-#     return Father.query.all()
-#
-#
-# def get_schools():
-#     return School.query.all()
-#
-#
-# def get_teachers():
-#     return Teacher.query.all()
-#
-#
-# def get_subjects():
-#     return Subject.query.all()
-#
-#
-# def get_cabinets():
-#     return Cabinet.query.all()
+def check_resolution(resolution):
+
+    def check_resolution_(form, field):
+        if type(field) == FileField:
+            if field.data.filename.split(".")[-1] != resolution:
+                form.errors.update({"link": ValidationError(f"File must be '{resolution}' resolution")})
+    return check_resolution_
 
 
 class AdminRegistrationForm(FlaskForm):
@@ -57,6 +35,10 @@ class AdminRegistrationForm(FlaskForm):
     email = EmailField("Email", validators=[InputRequired(), Length(max=256), Email()],
                        render_kw={"placeholder": "Email"})
     submit = SubmitField("Register")
+
+    def validate_email(self, field):
+        if User.query.filter_by(email=field.data).first():
+            raise ValidationError("Email must be unique")
 
 
 class AdminUpdateForm(FlaskForm):
@@ -74,6 +56,10 @@ class AdminUpdateForm(FlaskForm):
                        render_kw={"placeholder": "Email"})
     submit = SubmitField("Update")
 
+    def validate_email(self, field):
+        if User.query.filter_by(email=field.data).first():
+            raise ValidationError("Email must be unique")
+
 
 class AdminRegistrationStudentForm(AdminRegistrationForm):
     class_id = QuerySelectField("Class", query_factory=partial(get_data, Class), validators=[Optional()])
@@ -87,6 +73,8 @@ class AdminUpdateStudentForm(AdminUpdateForm):
     mother_id = QuerySelectField("Mother", query_factory=partial(get_data, Mother), validators=[Optional()])
     father_id = QuerySelectField("Father", query_factory=partial(get_data, Father), validators=[Optional()])
     score = IntegerField("Score", validators=[Optional()])
+    achievements = QuerySelectMultipleField("Achievements", query_factory=partial(get_data, Achievement),
+                                            validators=[Optional()])
 
 
 class AdminRegistrationParentForm(AdminRegistrationForm):
@@ -94,7 +82,7 @@ class AdminRegistrationParentForm(AdminRegistrationForm):
 
 
 class AdminUpdateParentForm(AdminUpdateForm):
-    type = RadioField("Пол", choices=[("mother", "Мама"), ("father", "Папа")], validators=[Optional()])
+    pass
 
 
 class AdminRegistrationClassForm(FlaskForm):
@@ -127,19 +115,21 @@ class AdminUpdateSubjectForm(FlaskForm):
 
 class AdminRegistrationLessonForm(FlaskForm):
     subject_id = QuerySelectField("Subject", query_factory=partial(get_data, Subject), validators=[InputRequired()])
-    datetime = DateTimeField("Date and Time", validators=[InputRequired()])
+    datetime = DateTimeLocalField("Date and Time", format="%Y-%m-%dT%H:%M", validators=[InputRequired()])
     duration = IntegerField("Duration", validators=[InputRequired()])
     teacher_id = QuerySelectField("Teacher", query_factory=partial(get_data, Teacher), validators=[InputRequired()])
     cabinet_id = QuerySelectField("Cabinet", query_factory=partial(get_data, Cabinet), validators=[InputRequired()])
+    class_id = QuerySelectField("Class", query_factory=partial(get_data, Class), validators=[Optional()])
     submit = SubmitField("Register")
 
 
 class AdminUpdateLessonForm(FlaskForm):
     subject_id = QuerySelectField("Subject", query_factory=partial(get_data, Subject), validators=[Optional()])
-    datetime = DateTimeField("Date and Time", validators=[Optional()])
+    datetime = DateTimeLocalField("Date and Time", format="%Y-%m-%dT%H:%M", validators=[Optional()])
     duration = IntegerField("Duration", validators=[Optional()])
     teacher_id = QuerySelectField("Teacher", query_factory=partial(get_data, Teacher), validators=[Optional()])
     cabinet_id = QuerySelectField("Cabinet", query_factory=partial(get_data, Cabinet), validators=[Optional()])
+    class_id = QuerySelectField("Class", query_factory=partial(get_data, Class), validators=[Optional()])
     submit = SubmitField("Update")
 
 
@@ -182,12 +172,20 @@ class AdminRegistrationTextbookForm(FlaskForm):
     link = FileField("Link to book", validators=[InputRequired()])
     submit = SubmitField("Register")
 
+    def validate_link(self, field):
+        if field.data.filename.split(".")[-1] != "pdf":
+            raise ValidationError(f"File must be 'pdf' resolution")
+
 
 class AdminUpdateTextbookForm(FlaskForm):
     subject_id = QuerySelectField("Subject", query_factory=partial(get_data, Subject), validators=[Optional()])
     class_number = IntegerField("Class", validators=[Optional()])
-    link = FileField("Link to book", validators=[Optional()])
+    link = FileField("Link to book", validators=[check_resolution('pdf'), Optional()])
     submit = SubmitField("Update")
+
+    def validate_link(self, field):
+        if field.data.filename.split(".")[-1] != "pdf":
+            raise ValidationError(f"File must be 'pdf' resolution")
 
 
 class AdminRegistrationAchievementForm(FlaskForm):

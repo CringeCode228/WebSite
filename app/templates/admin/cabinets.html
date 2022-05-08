@@ -1,10 +1,60 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "/admin/base.html" %}
 
-</body>
-</html>
+{% block title %}
+    {% if new_form is defined %}
+        New cabinet
+    {% elif update_form is defined %}
+        Edit cabinet №{{ current_cabinet.number }}
+    {% else %}
+        Cabinets
+    {% endif %}
+{% endblock %}
+
+{% block main %}
+    <table border="1">
+        <tr>
+            <td>ID</td>
+            <td>Номер</td>
+            <td>название</td>
+        </tr>
+        {% for cabinet in cabinets %}
+        <tr>
+            <td>
+                <a href="{{ url_for('admin_panel_cabinets_update', id_=cabinet.id_) }}">{{ cabinet.id_ }}</a>
+            </td>
+            <td>{{ cabinet.number }}</td>
+            <td>{{ cabinet.name }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <div>
+        <a href="{{ url_for('admin_panel_cabinets_new') }}">Новый кабинет</a>
+    </div>
+{% endblock %}
+{% block new %}
+    {% if new_form is defined %}
+        <form action="{{ url_for('admin_panel_cabinets_new') }}" method="post">
+            {% for field, error in new_form.errors.items() %}
+                <p>Error(s): {{ ", ".join(error) }}</p>
+            {% endfor %}
+            {{ new_form.csrf_token }}
+            {{ new_form.number }}<br>
+            {{ new_form.name }}<br>
+            {{ new_form.submit }}
+        </form>
+    {% endif %}
+{% endblock %}
+{% block update %}
+    {% if update_form is defined %}
+        <form action="{{ url_for('admin_panel_cabinets_update', id_=current_cabinet.id_) }}" method="post">
+            {% for field, error in update_form.errors.items() %}
+                <p>Error(s): {{ ", ".join(error) }}</p>
+            {% endfor %}
+            {{ update_form.csrf_token }}
+            {{ update_form.number }}<br>
+            {{ update_form.name }}<br>
+            {{ update_form.submit }}
+        </form>
+        <a href="{{ url_for('admin_panel_cabinets_remove', id_=current_cabinet.id_) }}">Удалить</a>
+    {% endif %}
+{% endblock %}

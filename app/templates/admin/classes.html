@@ -27,29 +27,31 @@
                 <a href="{{ url_for('admin_panel_students', id_=class.id_) }}">{{ class.id_ }}</a>
             </td>
             <td>{{ class.number }}{{ class.symbol }}</td>
-            <td><a href="{{ url_for('admin_panel_teachers', filter=class.manager) }}">{{ class.student_class_data.number }}{{ class.student_class_data.symbol }}</a></td>
+            <td><a href="{{ url_for('admin_panel_teachers_update', id_=class.manager.id_) }}">{{ class.student_class_data.number }}{{ class.student_class_data.symbol }}</a></td>
             <td>
-                <a href="{{ url_for('admin_panel_timetable', filter=class.id_) }}">оценки</a>
+                <a href="{{ url_for('admin_panel_timetable_update', id_=class.timetable.id_) }}">расписание</a>
             </td>
             <td>
-                <a href="{{ url_for('admin_panel_parents', id_=class.mother.id_) }}">Мама</a><br>
-                <a href="{{ url_for('admin_panel_parents', id_=class.father.id_) }}">папа</a>
+                <a href="{{ url_for('admin_panel_schools_update', id_=class.school.id_) }}">школа</a><br>
             </td>
             <td>
-                <a href="{{ url_for('admin_panel_achievements', filter=class.id_) }}"></a>
+                <a href="{{ url_for('admin_panel_students', class_id=class.id_) }}"></a>
+            </td>
+            <td>
+                <a href="{{ url_for('admin_panel_lessons', class_id=class.id_) }}"></a>
             </td>
         </tr>
         {% endfor %}
     </table>
     <div>
-        <a href="{{ url_for('admin_panel_students_new') }}">Новый ученик</a>
+        <a href="{{ url_for('admin_panel_students_new') }}">Новый класс</a>
     </div>
 {% endblock %}
 {% block new %}
     {% if new_form is defined %}
         <form action="{{ url_for('admin_panel_students_new') }}" method="post">
-            {% for error in new_form.form_errors %}
-                <p>{{ error }}</p>
+            {% for field, error in new_form.errors.items() %}
+                <p>Error(s): {{ ", ".join(error) }}</p>
             {% endfor %}
             {{ new_form.csrf_token }}
             {{ new_form.number }}<br>
@@ -67,7 +69,7 @@
                 <p>{{ error }}</p>
             {% endfor %}
             {{ update_form.csrf_token }}
-            {{ new_form.number }}<br>
+            Текущий номер: {{ current_class.number }} {{ new_form.number }}<br>
             {{ new_form.symbol }}<br>
             {{ new_form.class_manger_id_ }}<br>
             {{ new_form.school_id_ }}<br>

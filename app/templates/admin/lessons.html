@@ -1,10 +1,92 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "/admin/base.html" %}
 
-</body>
-</html>
+{% block title %}
+    {% if new_form is defined %}
+        New lesson
+    {% elif update_form is defined %}
+        Edit lesson
+    {% else %}
+        lessons
+    {% endif %}
+{% endblock %}
+
+{% block main %}
+    <table border="1">
+        <tr>
+            <td>ID</td>
+            <td>Предмет</td>
+            <td>дата</td>
+            <td>продолжительность</td>
+            <td>учитель</td>
+            <td>кабинет</td>
+            <td>класс</td>
+        </tr>
+        {% for lesson in lessons %}
+        <tr>
+            <td>
+                <a href="{{ url_for('admin_panel_lessons_update', id_=lesson.id_) }}">{{ lesson.id_ }}</a>
+            </td>
+            <td>
+                <a href="{{ url_for('admin_panel_subjects_update', id_=lesson.subject.id_) }}">
+                    {{ lesson.subject.name }}
+                </a>
+            </td>
+            <td>{{ lesson.datetime }}</td>
+            <td>{{ lesson.duration }} минут</td>
+            <td>
+                <a href="{{ url_for('admin_panel_teachers_update', id_=lesson.teacher.id_) }}">
+                    {{ lesson.teacher.teacher_user_data.surname }} {{ lesson.teacher.teacher_user_data.name }}
+                </a>
+            </td>
+            <td>
+                <a href="{{ url_for('admin_panel_cabinets_update', id_=lesson.lesson_cabinet_data.id_) }}">
+                    {{ lesson.lesson_cabinet_data.number }}
+                </a>
+            </td>
+            <td>
+                <a href="{{ url_for('admin_panel_classes_update', id_=lesson.lesson_class_data.id_) }}">
+                    {{ lesson.lesson_class_data.number }}{{ lesson.lesson_class_data.symbol }}
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    <div>
+        <a href="{{ url_for('admin_panel_lessons_new') }}">Новый урок</a>
+    </div>
+{% endblock %}
+{% block new %}
+    {% if new_form is defined %}
+        <form action="{{ url_for('admin_panel_lessons_new') }}" method="post">
+            {% for field, error in new_form.errors.items() %}
+                <p>Error(s): {{ ", ".join(error) }}</p>
+            {% endfor %}
+            {{ new_form.csrf_token }}
+            {{ new_form.subject_id }}<br>
+            {{ new_form.datetime }}<br>
+            {{ new_form.duration }}<br>
+            {{ new_form.teacher_id }}<br>
+            {{ new_form.cabinet_id }}<br>
+            {{ new_form.class_id}}<br>
+            {{ new_form.submit }}
+        </form>
+    {% endif %}
+{% endblock %}
+{% block update %}
+    {% if update_form is defined %}
+        <form action="{{ url_for('admin_panel_lessons_update', id_=current_lesson.id_) }}" method="post">
+            {% for field, error in update_form.errors.items() %}
+                <p>Error(s): {{ ", ".join(error) }}</p>
+            {% endfor %}
+            {{ update_form.csrf_token }}
+            {{ update_form.subject_id }}<br>
+            {{ update_form.datetime }}<br>
+            {{ update_form.duration }}<br>
+            {{ update_form.teacher_id }}<br>
+            {{ update_form.cabinet_id }}<br>
+            {{ update_form.class_id }}<br>
+            {{ update_form.submit }}
+        </form>
+        <a href="{{ url_for('admin_panel_lessons_remove', id_=current_lesson.id_) }}">Удалить</a>
+    {% endif %}
+{% endblock %}
