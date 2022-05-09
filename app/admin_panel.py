@@ -204,7 +204,7 @@ def admin_panel_teachers():
 def admin_panel_teachers_new():
     new_form = forms.AdminRegistrationForm()
     if new_form.validate_on_submit():
-        user = models.User(new_form.name.data, new_form.surname.data, new_form.password.data, 1, new_form.email.data)
+        user = models.User(new_form.name.data, new_form.surname.data, new_form.password.data, 3, new_form.email.data)
         db.session.add(user)
         db.session.commit()
         teacher = models.Teacher(user.id_)

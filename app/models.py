@@ -42,7 +42,7 @@ class User(db.Model, UserMixin):
         self.type = user_type
 
     def __repr__(self):
-        return "<User {}>".format(self.username)
+        return "<User {} {}>".format(self.surname, self.name)
 
     def set_password(self, password):
         self.password = generate_password_hash(password)

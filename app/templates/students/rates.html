@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}
+
+{% endblock %}
+
+{% block main %}
+    <table border="1">
+        <tr>
+            <td>
+                Предмет
+            </td>
+            <td>
+                Оценки
+            </td>
+            <td>
+                Средняя оценка
+            </td>
+        </tr>
+        {% for subject, rates in rates.items() %}
+        <tr>
+            <td>
+                {{ subject }}
+            </td>
+            <td>
+                {% set sum = namespace(value=0) %}
+                {% for rate in rates %}
+                    {{ rate.rate }}
+                    {% set sum.value = sum.value + rate.rate %}
+                {% endfor %}
+            </td>
+            <td>
+                {{ round(sum.value / len(rates), 2) }}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}
+
+{% endblock %}
+
+{% block main %}
+    <table border="1">
+        <tr>
+            <td>
+                Ачивка
+            </td>
+            <td>
+                Пояснение
+            </td>
+        </tr>
+        {% for achievement in achievements %}
+        <tr>
+            <td>
+                {{ achievement.name }}
+            </td>
+            <td>
+                {{ achievement.text }}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

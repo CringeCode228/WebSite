@@ -18,19 +18,18 @@ import random, string
 
 @application.route("/login", methods=["GET", "POST"])
 def login():
-    print(current_user)
+
     form = forms.LoginForm()
     if form.validate_on_submit():
         user = models.User.query.filter_by(id_=form.id_.data).first()
         if user is None:
-            print("User not found")
             flash('User not found')
             return redirect(url_for('login'))
         elif not user.check_password(form.password.data):
-            print("Invalid password")
             flash('Invalid password')
             return redirect(url_for('login'))
         login_user(user, remember=True)
+        print(current_user)
         return redirect(url_for('index'))
     return render_template("/authorization/login.html", user=current_user, form=form)
 

@@ -3,6 +3,7 @@ from flask import render_template
 from app import forms
 from app import authorization
 from app import admin_panel
+from app import student
 from flask import request
 from app import loginManager
 from flask_login import login_required, current_user
