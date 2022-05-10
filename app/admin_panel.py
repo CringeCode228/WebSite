@@ -391,18 +391,6 @@ def admin_panel_timetable():
     return render_template("admin/timetable.html", timetables=parse_filter(models.Timetable))
 
 
-@application.route("/admin_panel/timetable/new", methods=["GET", "POST"])
-@roles_required(Role.Admin)
-def admin_panel_timetable_new():
-    return "Page"
-
-
-@application.route("/admin_panel/timetable/<id_>", methods=["GET", "POST"])
-@roles_required(Role.Admin)
-def admin_panel_timetable_update(id_):
-    return "Page"
-
-
 @application.route("/admin_panel/cabinets")
 @roles_required(Role.Admin)
 def admin_panel_cabinets():

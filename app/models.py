@@ -267,6 +267,7 @@ class School(db.Model):
             return f"{self.number}"
 
 
+# Future content
 class Timetable(db.Model):
     id_ = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
     Monday = sqlalchemy.Column(sqlalchemy.String(100))
@@ -289,6 +290,7 @@ class Timetable(db.Model):
             self.Saturday = list_of_the_days[5]
 
 
+# Future content
 class TimetableLesson(db.Model):
     id_ = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
     subject_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("subject.id_"), nullable=False)
