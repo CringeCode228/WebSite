@@ -40,19 +40,12 @@ def logout():
     return redirect(url_for("index"))
 
 
-@application.route("/profile")
-@login_required
-def profile():
-    return render_template("/authorization/profile.html", user=current_user)
-
-
 @loginManager.user_loader
 def load_user(user_id):
     return models.User.query.get(int(user_id))
 
 
 class MyUserManager(UserManager):
-
     def unauthenticated_view(self):
         return abort(404)
 

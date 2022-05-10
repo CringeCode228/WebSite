@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}
+
+{% endblock %}
+
+{% block main %}
+    {% if mother is defined %}
+        <h3>{{ mother.mother_user_data.surname }} {{ mother.mother_user_data.name }}</h3><br>
+        почта: {{ mother.mother_user_data.email }}<br>
+    {% else %}
+        <h3>{{ father.father_user_data.surname }} {{ father.father_user_data.name }}</h3><br>
+        почта: {{ father.father_user_data.email }}<br>
+    {% endif %}
+{% endblock %}

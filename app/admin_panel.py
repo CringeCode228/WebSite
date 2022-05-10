@@ -56,7 +56,7 @@ def admin_panel_students_new():
         user = models.User(new_form.name.data, new_form.surname.data, new_form.password.data, 0, new_form.email.data)
         db.session.add(user)
         db.session.commit()
-        student = models.Student(user.id_)
+        student = models.Student(user.id_, new_form.class_id.data)
         db.session.add(student)
         db.session.commit()
         return redirect(url_for('admin_panel_students'))

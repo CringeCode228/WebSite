@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}
+
+{% endblock %}
+
+{% block main %}
+    <h3>{{ teacher.teacher_user_data.surname }} {{ teacher.teacher_user_data.name }}</h3><br>
+    почта: {{ teacher.teacher_user_data.email }}<br>
+    <a href="{{ url_for('teacher_timetable_today') }}">расписание</a><br>
+{% endblock %}

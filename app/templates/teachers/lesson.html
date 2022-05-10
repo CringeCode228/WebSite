@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}
+    
+{% endblock %}
+
+{% block main %}
+    <a href="{{ url_for('teacher_timetable_today') }}">Расписание</a><br>
+    <a href="{{ url_for('teacher_set_rate', id_=lesson.id_) }}">Поставить оценку</a><br>
+    Начало: {{ lesson.datetime.time().strftime('%H:%M') }}<br>
+    Конец: {{ (lesson.datetime + delta(minutes=lesson.duration)).time().strftime('%H:%M') }}
+    <table border="1">
+        <tr>
+            <td>№</td>
+            <td>Ученик</td>
+            <td>Оценки</td>
+            <td>Присутствие</td>
+        </tr>
+        {% for student in lesson.lesson_class_data.students %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ student.student_user_data.name }} {{ student.student_user_data.surname }}</td>
+                <td>
+                {% for rate in Rate.query.filter(Rate.student == student, Rate.lesson == lesson).all() %}
+                    {{ rate.rate }}
+                {% endfor %}
+                </td>
+                <td>
+                    {% if student in lesson.missing_students %}
+                        Н
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+    <form action="{{ url_for('teacher_lesson', id_=lesson.id_) }}" method="post">
+        {% for error in form.errors %}
+            <p>{{ error }}</p>
+        {% endfor %}
+        {{ form.csrf_token }}
+        {{ form.homework }}<br>
+        {{ form.missing_students }}<br>
+        {{ form.submit }}
+    </form>
+{% endblock %}

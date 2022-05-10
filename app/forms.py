@@ -1,7 +1,7 @@
 import sqlalchemy
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, EmailField, IntegerField, TimeField, FileField, \
-    RadioField, DateTimeLocalField
+    RadioField, DateTimeLocalField, SelectField, HiddenField
 from wtforms.validators import DataRequired, Email, EqualTo, InputRequired, Length, Optional, NumberRange, Regexp
 from wtforms_sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
 from app.models import Class, Mother, Father, School, Teacher, Subject, Cabinet, Lesson, Student, User, Achievement
@@ -202,12 +202,6 @@ class AdminUpdateAchievementForm(FlaskForm):
     submit = SubmitField("Update")
 
 
-class LoginForm(FlaskForm):
-    id_ = IntegerField("Login", validators=[InputRequired()])
-    password = PasswordField("Password", validators=[InputRequired()])
-    submit = SubmitField("Submit")
-
-
 class AdminRegistrationSchoolForm(FlaskForm):
     number = IntegerField("Number", validators=[InputRequired()])
     name = StringField("Name", validators=[Optional()])
@@ -217,3 +211,29 @@ class AdminRegistrationSchoolForm(FlaskForm):
 class AdminUpdateSchoolForm(FlaskForm):
     name = StringField("Name", validators=[Optional()])
     submit = SubmitField("Update")
+
+
+class LoginForm(FlaskForm):
+    id_ = IntegerField("Login", validators=[InputRequired()])
+    password = PasswordField("Password", validators=[InputRequired()])
+    submit = SubmitField("Submit")
+
+
+def teacher_lesson_form(lesson):
+    class TeacherLessonForm(FlaskForm):
+        homework = StringField("Home work", validators=[Length(-1, 999)])
+        missing_students = QuerySelectMultipleField("Missing students",
+                                                    query_factory=lambda: lesson.lesson_class_data.students)
+        submit = SubmitField("Submit")
+    lesson_form = TeacherLessonForm()
+    return lesson_form
+
+
+def teacher_rate_form(lesson):
+    class TeacherRateForm(FlaskForm):
+        rate = SelectField("Rate", choices=("2", "3", "4", "5"))
+        student_id = QuerySelectField("Student", query_factory=lambda: lesson.lesson_class_data.students)
+        lesson_id = lesson
+        submit = SubmitField("Submit")
+    rate_form = TeacherRateForm()
+    return rate_form

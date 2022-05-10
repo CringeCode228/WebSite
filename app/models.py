@@ -11,11 +11,21 @@ from app.roles import Role
 student_achievement = sqlalchemy.Table('student_achievement',
                                        db.metadata,
                                        sqlalchemy.Column('id_', sqlalchemy.Integer, primary_key=True,
-                                                         autoincrement=False),
+                                                         autoincrement=True),
                                        sqlalchemy.Column('student', sqlalchemy.Integer,
                                                          sqlalchemy.ForeignKey('student.id_')),
                                        sqlalchemy.Column('achievement', sqlalchemy.Integer,
                                                          sqlalchemy.ForeignKey('achievement.id_')))
+
+
+missing_students = sqlalchemy.Table('missing_students',
+                                    db.metadata,
+                                    sqlalchemy.Column('id_', sqlalchemy.Integer, primary_key=True,
+                                                      autoincrement=True),
+                                    sqlalchemy.Column('student', sqlalchemy.Integer,
+                                                      sqlalchemy.ForeignKey('student.id_')),
+                                    sqlalchemy.Column('lesson', sqlalchemy.Integer,
+                                                      sqlalchemy.ForeignKey('lesson.id_')))
 
 
 class User(db.Model, UserMixin):
@@ -25,7 +35,7 @@ class User(db.Model, UserMixin):
     password = sqlalchemy.Column(sqlalchemy.String(102), nullable=False)
     email = sqlalchemy.Column(sqlalchemy.String(255), unique=True)
 
-    # 0 - student, 1 - mother, 2 - father, 3 - teacher, 4 - admin
+    # 0 - student, 1 - mother, 2 - father, 3 - teachers, 4 - admin
     type = sqlalchemy.Column(sqlalchemy.Integer, nullable=False)
 
     students = db.relationship('Student', backref='student_user_data', lazy='dynamic')
@@ -84,9 +94,9 @@ class Student(db.Model):
     rates = orm.relationship("Rate", backref="student", lazy='dynamic')
     achievements = orm.relationship("Achievement", secondary=student_achievement, backref='students')
 
-    def __init__(self, user_id, class_id=None):
+    def __init__(self, user_id, class_id):
         self.user_id = user_id
-        self.class_id = class_id
+        self.student_class_data = class_id
 
     def __repr__(self):
         return f"{self.student_user_data.name} {self.student_user_data.surname}"
@@ -163,7 +173,7 @@ class Lesson(db.Model):
     class_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("class.id_"))
     teacher_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("teacher.id_"))
     cabinet_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("cabinet.id_"))
-    missing_students = sqlalchemy.Column(sqlalchemy.String(255))
+    missing_students = orm.relationship("Student", secondary=missing_students, backref='missing_lessons')
     homework = sqlalchemy.Column(sqlalchemy.Text(1000))
 
     rates = orm.relationship("Rate", backref="lesson", lazy="dynamic")
@@ -291,7 +301,7 @@ class TimetableLesson(db.Model):
         self.subject_id = subject_id
         self.time = time
         self.duration = duration
-        self.teacher_id = teacher_id
+        self.teacher = teacher_id
         self.cabinet = cabinet
 
 

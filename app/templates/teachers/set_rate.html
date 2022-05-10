@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}
+    
+{% endblock %}
+
+{% block main %}
+    <a href="{{ url_for('teacher_lesson', id_=lesson.id_) }}">Обратно</a><br>
+    <form action="{{ url_for('teacher_set_rate', id_=lesson.id_) }}" method="post">
+        {% for error in form.errors %}
+            <p>{{ error }}</p>
+        {% endfor %}
+        {{ form.csrf_token }}
+        {{ form.student_id }}<br>
+        {{ form.rate }}<br>
+        {{ form.submit }}
+    </form>
+{% endblock %}

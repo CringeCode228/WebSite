@@ -31,24 +31,6 @@ days = {0: "Понедельник",
         6: "Воскресенье"}
 
 
-def set_field(new_value, old_value):
-    if new_value:
-        return new_value
-    else:
-        return old_value
-
-
-def parse_filter(class_):
-    params = list(request.args.keys())
-    if len(params) and hasattr(class_, params[0]):
-        field = params[0]
-        data = request.args[field]
-        results = class_.query.filter_by(**{field: data})  # 'class_' is database model
-        return results
-    else:
-        return class_.query.all()
-
-
 def get_self():
     return Student.query.filter_by(user_id=current_user.id_).first()
 
