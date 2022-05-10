@@ -1,5 +1,10 @@
 from app import application
 from flask import render_template
+from app.authorization import *
+from app.admin_panel import *
+from app.student import *
+from app.parent import *
+from app.teacher import *
 from app import loginManager
 from flask_login import current_user
 from flask import redirect, url_for
