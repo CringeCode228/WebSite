@@ -1,19 +1,12 @@
 from app import application
 from app import loginManager
-from app import models
 from flask import render_template, flash, redirect, url_for
 from app import forms
 from flask_login import current_user, login_user, logout_user
 from app import models
 from app import db
-from werkzeug.security import generate_password_hash
-import random
-from flask_login import login_required
-from app import no_cache
-from app import db
 from flask_user.user_manager import UserManager
 from flask import abort
-import random, string
 
 
 @application.route("/login", methods=["GET", "POST"])

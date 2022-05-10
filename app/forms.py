@@ -1,8 +1,7 @@
-import sqlalchemy
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, EmailField, IntegerField, TimeField, FileField, \
-    RadioField, DateTimeLocalField, SelectField, HiddenField
-from wtforms.validators import DataRequired, Email, EqualTo, InputRequired, Length, Optional, NumberRange, Regexp
+from wtforms import StringField, PasswordField, SubmitField, EmailField, IntegerField, FileField, RadioField, \
+    DateTimeLocalField, SelectField
+from wtforms.validators import Email, EqualTo, InputRequired, Length, Optional, NumberRange
 from wtforms_sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
 from app.models import Class, Mother, Father, School, Teacher, Subject, Cabinet, Lesson, Student, User, Achievement
 from functools import partial

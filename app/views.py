@@ -1,16 +1,8 @@
 from app import application
 from flask import render_template
-from app import forms
-from app import authorization
-from app import admin_panel
-from app import student
-from app import parent
-from app import teacher
-from flask import request
 from app import loginManager
-from flask_login import login_required, current_user
+from flask_login import current_user
 from flask import redirect, url_for
-from app import no_cache
 
 
 @application.route("/index")

@@ -1,10 +1,8 @@
 from app import db, loginManager
-from enum import Enum
 import sqlalchemy
 from flask_login import UserMixin, AnonymousUserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import orm
-from typing import List
 from app.roles import Role
 
 
