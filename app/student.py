@@ -18,8 +18,13 @@ import os
 from flask import flash
 from datetime import datetime, timedelta
 from sqlalchemy import func
-from app.models import Lesson, Student, Rate, Achievement, Subject
+from app.models import Lesson, Student, Rate, Achievement, Subject, Textbook
 from sqlalchemy.orm import joinedload
+from app.forms import student_score_trade_form
+from flask import session
+
+
+SCORE_FOR_FIVE_RATE = 50
 
 
 days = {0: "Понедельник",
@@ -101,3 +106,37 @@ def student_rates():
 @roles_required(Role.Student)
 def student_achievements():
     return render_template("students/achievements.html", achievements=get_self().achievements)
+
+
+@application.route("/students/me/textbooks")
+@roles_required(Role.Student)
+def student_textbooks():
+    textbooks = Textbook.query.filter_by(class_number=get_self().student_class_data.number)
+    return render_template("students/textbooks.html", textbooks=textbooks)
+
+
+@application.route("/students/me/textbooks/<int:id_>/download")
+@roles_required(Role.Student)
+def student_textbooks_download(id_):
+    current_textbook = models.Textbook.query.filter_by(id_=id_).first()
+    root_dir = os.path.dirname(os.getcwd())
+    return send_from_directory(os.path.join(root_dir, application.static_folder, 'textbooks'), current_textbook.link)
+
+
+@application.route("/students/me/score_trade", methods=["GET", "POST"])
+@roles_required(Role.Student)
+def student_score_trade():
+    student = get_self()
+    form = student_score_trade_form(student)
+    if form.validate_on_submit():
+        if student.score >= SCORE_FOR_FIVE_RATE:
+            rate = Rate(5, student, form.lesson_id.data)
+            student.score -= SCORE_FOR_FIVE_RATE
+            db.session.add(rate)
+            db.session.commit()
+            message = f"Вы получили пять за урок '{form.lesson_id.data}'!"
+        else:
+            message = f"Недостаточно очков("
+        return render_template("students/score_trade.html", form=form, score=SCORE_FOR_FIVE_RATE, student=student,
+                        message=message)
+    return render_template("students/score_trade.html", form=form, score=SCORE_FOR_FIVE_RATE, student=student)

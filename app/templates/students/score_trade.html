@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Обмен очков на оценки
+{% endblock %}
+
+{% block main %}
+    Одна пятёрка - {{ score }} очков<br>
+    Текущие очки - {{ student.score }}<br>
+    {% if message is defined %}
+        {{ message }}
+    {% endif %}
+    <form action="{{ url_for('student_score_trade') }}" method="post">
+        {% for error in form.errors %}
+            <p>{{ error }}</p>
+        {% endfor %}
+        {{ form.csrf_token }}
+        {{ form.lesson_id.label }}{{ form.lesson_id }}
+        {{ form.submit }}
+    </form>
+{% endblock %}

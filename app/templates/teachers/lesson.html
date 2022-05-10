@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block title %}
-    
+    Урок
 {% endblock %}
 
 {% block main %}
@@ -38,7 +38,14 @@
             <p>{{ error }}</p>
         {% endfor %}
         {{ form.csrf_token }}
-        Текущее ДЗ: {{ lesson.homework }}<br> {{ form.homework }}<br>
+        Текущее ДЗ:
+        {% if lesson.homework %}
+            {{ lesson.homework }}
+        {% else %}
+            Не задано
+        {% endif %}<br>
+        Введите новое: {{ form.homework }}<br>
+        Выберите отсутствующих:<br>
         {{ form.missing_students }}<br>
         {{ form.submit }}
     </form>

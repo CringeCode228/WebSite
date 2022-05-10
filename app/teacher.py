@@ -18,7 +18,7 @@ import os
 from flask import flash
 from datetime import datetime, timedelta
 from sqlalchemy import func
-from app.models import Lesson, Teacher, Rate, Achievement, Subject, Teacher
+from app.models import Lesson, Rate, Achievement, Subject, Teacher, Student
 from sqlalchemy.orm import joinedload
 from app.forms import teacher_lesson_form, teacher_rate_form
 
@@ -115,8 +115,37 @@ def teacher_set_rate(id_):
         return abort(404)
     form = teacher_rate_form(lesson)
     if form.validate_on_submit():
-        rate = Rate(form.rate.data, form.student_id.data, form.lesson_id)
+        rate = Rate(int(form.rate.data), form.student_id.data, form.lesson_id)
+        if form.rate.data == "5":
+            form.student_id.data.score += 10
+        elif form.rate.data == "4":
+            form.student_id.data.score += 5
+        elif form.rate.data == "2":
+            form.student_id.data.score -= 5
+            form.student_id.data.score = max(form.student_id.data.score, 0)
+
+        # check achievements because student have got a rate
+        check_achievement(form.student_id.data)
         db.session.add(rate)
         db.session.commit()
         return redirect(url_for("teacher_lesson", id_=id_))
     return render_template("teachers/set_rate.html", lesson=lesson, form=form, Rate=Rate)
+
+
+def check_achievement(student):
+
+    # The function check if current student get necessary rates to get some achievements
+    # The function depends on achievements data
+
+    # For example:
+
+    five_rates = 0
+    for rate in student.rates:
+        if rate.rate == 5:
+            five_rates += 1
+    if five_rates >= 10:
+        achievement = Achievement.query.filter_by(id_=1).first()
+        if achievement not in student.achievements:
+            student.achievements.append(achievement)
+            student.score += achievement.score
+            db.session.commit()

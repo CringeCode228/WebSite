@@ -206,9 +206,9 @@ class Cabinet(db.Model):
 
     def __repr__(self):
         if self.name:
-            return f"{self.number}"
-        else:
             return f"{self.name} №{self.number}"
+        else:
+            return f"{self.number}"
 
 
 class Rate(db.Model):

@@ -29,7 +29,7 @@
             <td>{{ class.number }}{{ class.symbol }}</td>
             <td>
                 <a href="{{ url_for('admin_panel_teachers_update', id_=class.manager.id_) }}">
-                    {{ class.manager.teacher_user_data.surname }}{{ class.manager.teacher_user_data.symbol }}
+                    {{ class.manager.teacher_user_data.surname }} {{ class.manager.teacher_user_data.name }}
                 </a>
             </td>
             <td>

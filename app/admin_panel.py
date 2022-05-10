@@ -92,7 +92,11 @@ def admin_panel_students_update(id_):
 @application.route("/admin_panel/students/<id_>/remove")
 @roles_required(Role.Admin)
 def admin_panel_students_remove(id_):
-    models.Student.query.filter_by(id_=id_).delete()
+    student = models.Student.query.filter_by(id_=id_).first()
+    current_id = student.user_id
+    db.session.delete(student)
+    db.session.commit()
+    models.User.query.filter_by(id_=current_id).delete()
     db.session.commit()
     return redirect(url_for("admin_panel_students"))
 
@@ -160,7 +164,11 @@ def admin_panel_mothers_update(id_):
 @application.route("/admin_panel/parents/mothers/<id_>/remove")
 @roles_required(Role.Admin)
 def admin_panel_mothers_remove(id_):
-    models.Mother.query.filter_by(id_=id_).delete()
+    mother = models.Mother.query.filter_by(id_=id_).first()
+    current_id = mother.user_id
+    db.session.delete(mother)
+    db.session.commit()
+    models.User.query.filter_by(id_=current_id).delete()
     db.session.commit()
     return redirect(url_for("admin_panel_parents"))
 
@@ -188,7 +196,11 @@ def admin_panel_fathers_update(id_):
 @application.route("/admin_panel/parents/fathers/<id_>/remove")
 @roles_required(Role.Admin)
 def admin_panel_fathers_remove(id_):
-    models.Father.query.filter_by(id_=id_).delete()
+    father = models.Father.query.filter_by(id_=id_).first()
+    current_id = father.user_id
+    db.session.delete(father)
+    db.session.commit()
+    models.User.query.filter_by(id_=current_id).delete()
     db.session.commit()
     return redirect(url_for("admin_panel_parents"))
 
@@ -211,7 +223,7 @@ def admin_panel_teachers_new():
         db.session.add(teacher)
         db.session.commit()
         return redirect(url_for('admin_panel_teachers'))
-    return render_template("admin/teachers.html", teachers=models.Mother.query.all(), new_form=new_form)
+    return render_template("admin/teachers.html", teachers=models.Teacher.query.all(), new_form=new_form)
 
 
 @application.route("/admin_panel/teachers/<id_>", methods=["GET", "POST"])
@@ -237,7 +249,11 @@ def admin_panel_teachers_update(id_):
 @application.route("/admin_panel/teachers/<id_>/remove")
 @roles_required(Role.Admin)
 def admin_panel_teachers_remove(id_):
-    models.Teacher.query.filter_by(id_=id_).delete()
+    teacher = models.Teacher.query.filter_by(id_=id_).first()
+    current_id = teacher.user_id
+    db.session.delete(teacher)
+    db.session.commit()
+    models.User.query.filter_by(id_=current_id).delete()
     db.session.commit()
     return redirect(url_for("admin_panel_teachers"))
 

@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
 {% block title %}
-
+    Профиль
 {% endblock %}
 
 {% block main %}
-    <h3>{{ student.student_user_data.name }} {{ student.student_user_data.name }}</h3><br>
+    <h3>{{ student.student_user_data.name }} {{ student.student_user_data.surname }}</h3><br>
     класс: {{ student.student_class_data.number }}{{ student.student_class_data.symbol }}<br>
     почта: {{ student.student_user_data.email }}<br>
     <a href="{{ url_for('student_rates') }}">оценики</a><br>
@@ -13,4 +13,6 @@
     получено достижений: {{ len(student.achievements) }},
     <a href="{{ url_for('student_achievements') }}">список</a><br>
     <a href="{{ url_for('student_timetable_today') }}">расписание</a><br>
+    <a href="{{ url_for('student_textbooks') }}">учебники</a><br>
+    <a href="{{ url_for('student_score_trade') }}">Обмен очков на оценки</a>
 {% endblock %}

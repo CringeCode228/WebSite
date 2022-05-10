@@ -1,26 +1,26 @@
 {% extends "base.html" %}
 
 {% block title %}
-    Достижения
+    Учебники
 {% endblock %}
 
 {% block main %}
     <table border="1">
         <tr>
             <td>
-                Ачивка
+                Предмет
             </td>
             <td>
-                Пояснение
+                Ссылка
             </td>
         </tr>
-        {% for achievement in achievements %}
+        {% for textbook in textbooks %}
         <tr>
             <td>
-                {{ achievement.name }}
+                {{ textbook.subject }}
             </td>
             <td>
-                {{ achievement.text }}
+                <a href="{{ url_for('student_textbooks_download', id_=textbook.id_) }}">ссылка</a>
             </td>
         </tr>
         {% endfor %}

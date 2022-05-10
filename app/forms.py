@@ -14,11 +14,11 @@ def get_data(class_):
 
 
 def check_resolution(resolution):
-
     def check_resolution_(form, field):
         if type(field) == FileField:
             if field.data.filename.split(".")[-1] != resolution:
                 form.errors.update({"link": ValidationError(f"File must be '{resolution}' resolution")})
+
     return check_resolution_
 
 
@@ -219,12 +219,23 @@ class LoginForm(FlaskForm):
     submit = SubmitField("Submit")
 
 
+def student_score_trade_form(student):
+    class StudentScoreTrade(FlaskForm):
+        lesson_id = QuerySelectField("Выберите урок: ",
+                                     query_factory=lambda:
+                                     Lesson.query.filter(Lesson.lesson_class_data == student.student_class_data).all())
+        submit = SubmitField("Обменять")
+    score_trade = StudentScoreTrade()
+    return score_trade
+
+
 def teacher_lesson_form(lesson):
     class TeacherLessonForm(FlaskForm):
         homework = StringField("Home work", validators=[Length(-1, 999)])
         missing_students = QuerySelectMultipleField("Missing students",
                                                     query_factory=lambda: lesson.lesson_class_data.students)
         submit = SubmitField("Submit")
+
     lesson_form = TeacherLessonForm()
     return lesson_form
 
@@ -235,5 +246,6 @@ def teacher_rate_form(lesson):
         student_id = QuerySelectField("Student", query_factory=lambda: lesson.lesson_class_data.students)
         lesson_id = lesson
         submit = SubmitField("Submit")
+
     rate_form = TeacherRateForm()
     return rate_form
