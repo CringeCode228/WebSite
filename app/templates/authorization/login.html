@@ -7,13 +7,13 @@
 {% block main %}
     <div class="sign_in">
         <div class="sign_in_text">
-            Sign In
+            Вход
         </div>
         <div class="sign_in_form">
             <form action="{{ url_for('login') }}" method="post">
                 {{ form.csrf_token }}
-                {{ form.id_ }}<br>
-                {{ form.password }}<br>
+                Введите логин: {{ form.id_ }}<br>
+                Введтие пароль: {{ form.password }}<br>
                 {{ form.submit }}
             </form>
         </div>
