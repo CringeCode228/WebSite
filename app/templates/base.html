@@ -8,18 +8,19 @@
     </title>
     <body>
         <div class="header">
-            <div class="logo">
-                <a href="{{ url_for('index') }}">
-                    <img src="{{ url_for('static', filename='/images/logo.png')}}">
-                </a>
-            </div>
-            <div class="search">
-            </div>
             <div class="account">
-                <div class="account_image">
-                </div>
-                <div class="account_name">
-                </div>
+                {% if current_user.type == 0 %}
+                    <a href="{{ url_for('student_profile') }}">Профиль</a>
+                    <a href="{{ url_for('logout') }}">Выход</a>
+                {% elif current_user.type == 1 or current_user.type == 2 %}
+                    <a href="{{ url_for('parent_profile') }}">Профиль</a>
+                    <a href="{{ url_for('logout') }}">Выход</a>
+                {% elif current_user.type == 3 %}
+                    <a href="{{ url_for('teacher_profile') }}">Профиль</a>
+                    <a href="{{ url_for('logout') }}">Выход</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}">Вход</a>
+                {% endif %}
             </div>
         </div>
         <div class="main">

@@ -38,7 +38,7 @@
             <p>{{ error }}</p>
         {% endfor %}
         {{ form.csrf_token }}
-        {{ form.homework }}<br>
+        Текущее ДЗ: {{ lesson.homework }}<br> {{ form.homework }}<br>
         {{ form.missing_students }}<br>
         {{ form.submit }}
     </form>

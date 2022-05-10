@@ -62,8 +62,9 @@
                 <p>Error(s): {{ ", ".join(error) }}</p>
             {% endfor %}
             {{ update_form.csrf_token }}
-            {{ update_form.rate }}<br>
-            {{ update_form.lesson_id }}<br>
+            Текущий ученик: {{ current_rate.student }}<br>
+            Текущая оценка: {{ current_rate.rate }}, Введите новую: {{ update_form.rate }}<br>
+            Текущий урок: {{ current_rate.lesson}}, Введите новый: {{ update_form.lesson_id }}<br>
             {{ update_form.submit }}
         </form>
         <a href="{{ url_for('admin_panel_rates_remove', id_=current_rate.id_) }}">Удалить</a>

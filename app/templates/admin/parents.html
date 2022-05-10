@@ -68,30 +68,29 @@
 {% block update %}
     {% if update_form is defined %}
         {% if current_mother is defined %}
-        <form action="{{ url_for('admin_panel_mothers_update', id_=current_mother.id_) }}" method="post">
-            {% for error in update_form.errors %}
-                <p>{{ error }}</p>
-            {% endfor %}
-            {{ update_form.csrf_token }}
-            {{ update_form.name }}<br>
-            {{ update_form.surname }}<br>
-            {{ update_form.password }}<br>
-            {{ update_form.password_check }}<br>
-            {{ update_form.email }}<br>
-            {{ update_form.type }}<br>
-            {{ update_form.submit }}
-        </form>
+            <form action="{{ url_for('admin_panel_mothers_update', id_=current_mother.id_) }}" method="post">
+                {% for error in update_form.errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+                {{ update_form.csrf_token }}
+                Текущее имя: {{ current_mother.mother_user_data.name }}, Введите новое: {{ update_form.name }}<br>
+                Текущая фамилия: {{ current_mother.mother_user_data.surname }}, Введите новую: {{ update_form.surname }}<br>
+                {{ update_form.password }}<br>
+                {{ update_form.password_check }}<br>
+                Текущая почта: {{ current_mother.mother_user_data.email }}, Введите новую: {{ update_form.email }}<br>
+                {{ update_form.submit }}
+            </form>
         {% elif current_father is defined %}
             <form action="{{ url_for('admin_panel_fathers_update', id_=current_father.id_) }}" method="post">
                 {% for error in update_form.errors %}
                     <p>{{ error }}</p>
                 {% endfor %}
                 {{ update_form.csrf_token }}
-                {{ update_form.name }}<br>
-                {{ update_form.surname }}<br>
+                Текущее имя: {{ current_mother.mother_user_data.name }}, Введите новое: {{ update_form.name }}<br>
+                Текущая фамилия: {{ current_father.father_user_data.surname }}, Введите новую: {{ update_form.surname }}<br>
                 {{ update_form.password }}<br>
                 {{ update_form.password_check }}<br>
-                {{ update_form.email }}<br>
+                Текущая почта: {{ current_father.father_user_data.email }}, Введите новую: {{ update_form.email }}<br>
                 {{ update_form.submit }}
             </form>
         {% endif %}

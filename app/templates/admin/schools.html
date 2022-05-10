@@ -51,7 +51,8 @@
                 <p>Error(s): {{ ", ".join(error) }}</p>
             {% endfor %}
             {{ update_form.csrf_token }}
-            {{ update_form.name }}<br>
+            Текущий номер: {{ current_school.number }}<br>
+            Текущие название: {{ current_school.name }}, введите новое: {{ update_form.name }}<br>
             {{ update_form.submit }}
         </form>
         <a href="{{ url_for('admin_panel_schools_remove', id_=current_school.id_) }}">Удалить</a>

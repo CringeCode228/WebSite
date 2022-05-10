@@ -54,9 +54,9 @@
                 <p>Error(s): {{ ", ".join(error) }}</p>
             {% endfor %}
             {{ update_form.csrf_token }}
-            {{ update_form.name }}<br>
-            {{ update_form.text }}<br>
-            {{ update_form.score }}<br>
+            Текущее название: {{ current_achievement.name }}, Укажите новое: {{ update_form.name }}<br>
+            Текущее пояснение: {{ current_achievement.text }}, Укажите новое: {{ update_form.text }}<br>
+            Текущие очки за данную ачивку: {{ current_achievement.score }}, Введите новые: {{ update_form.score }}<br>
             {{ update_form.submit }}
         </form>
         <a href="{{ url_for('admin_panel_achievements_remove', id_=current_achievement.id_) }}">Удалить</a>

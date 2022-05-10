@@ -48,7 +48,7 @@
                 <p>Error(s): {{ ", ".join(error) }}</p>
             {% endfor %}
             {{ update_form.csrf_token }}
-            {{ update_form.name }}<br>
+            Текущее название: {{ current_subject.name }}, Введите новое: {{ update_form.name }}<br>
             {{ update_form.submit }}
         </form>
         <a href="{{ url_for('admin_panel_subjects_remove', id_=current_subject.id_) }}">Удалить</a>

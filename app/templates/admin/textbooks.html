@@ -58,9 +58,9 @@
                 <p>Error(s): {{ ", ".join(error) }}</p>
             {% endfor %}
             {{ update_form.csrf_token }}
-            {{ update_form.subject_id }}<br>
-            {{ update_form.class_number }}<br>
-            {{ update_form.link }}<br>
+            Текущий предмет: {{ current_textbooks.subject }}, Введите новый: {{ update_form.subject_id }}<br>
+            Текущий класс: {{ current_textbook.class_number }}, Введите новый: {{ update_form.class_number }}<br>
+            Текущая <a href="{{ url_for('admin_panel_textbooks_download', id_=current_textbook.id_) }}">ссылка</a>, Укажите новый файл: {{ update_form.link }}<br>
             {{ update_form.submit }}
         </form>
         <a href="{{ url_for('admin_panel_textbooks_remove', id_=current_textbook.id_) }}">Удалить</a>

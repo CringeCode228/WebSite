@@ -51,8 +51,8 @@
                 <p>Error(s): {{ ", ".join(error) }}</p>
             {% endfor %}
             {{ update_form.csrf_token }}
-            {{ update_form.number }}<br>
-            {{ update_form.name }}<br>
+            Текущий номер: {{ current_cabinet.number }}, Укажите новый: {{ update_form.number }}<br>
+            Текущее имя: {{ current_cabinet.name }}, Укажите новое: {{ update_form.name }}<br>
             {{ update_form.submit }}
         </form>
         <a href="{{ url_for('admin_panel_cabinets_remove', id_=current_cabinet.id_) }}">Удалить</a>

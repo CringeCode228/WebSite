@@ -79,12 +79,12 @@
                 <p>Error(s): {{ ", ".join(error) }}</p>
             {% endfor %}
             {{ update_form.csrf_token }}
-            {{ update_form.subject_id }}<br>
-            {{ update_form.datetime }}<br>
-            {{ update_form.duration }}<br>
-            {{ update_form.teacher_id }}<br>
-            {{ update_form.cabinet_id }}<br>
-            {{ update_form.class_id }}<br>
+            Текущий предмет: {{ current_lesson.subject }}, Укажите новый: {{ update_form.subject_id }}<br>
+            Текущее время: {{ current_lesson.datetime }}, Введите новое{{ update_form.datetime }}<br>
+            Текущая продолжительность: {{ current_lesson.duration }}, Введите новую: {{ update_form.duration }}<br>
+            Текущий учитель: {{ current_lesson.teacher }}, Укажите нового: {{ update_form.teacher_id }}<br>
+            Текущий кабинет: {{ current_lesson.lesson_cabinet_data }}, Укажите новый: {{ update_form.cabinet_id }}<br>
+            Текущий класс: {{ current_lesson.lesson_class_data }}, укажите новый: {{ update_form.class_id }}<br>
             {{ update_form.submit }}
         </form>
         <a href="{{ url_for('admin_panel_lessons_remove', id_=current_lesson.id_) }}">Удалить</a>

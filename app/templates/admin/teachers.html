@@ -52,11 +52,11 @@
                 <p>{{ error }}</p>
             {% endfor %}
             {{ update_form.csrf_token }}
-            {{ update_form.name }}<br>
-            {{ update_form.surname }}<br>
+            Текущее имя: {{ current_teacher.teacher_user_data.name }}, Введите новое: {{ update_form.name }}<br>
+            Текущая фамилия: {{ current_teacher.teacher_user_data.surname }}, Введите новую: {{ update_form.surname }}<br>
             {{ update_form.password }}<br>
             {{ update_form.password_check }}<br>
-            {{ update_form.email }}<br>
+            Текущая почта: {{ current_teacher.teacher_user_data.email }}, Введите новую: {{ update_form.email }}<br>
             {{ update_form.submit }}
         </form>
     {% endif %}

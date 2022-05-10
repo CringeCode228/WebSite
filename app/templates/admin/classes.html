@@ -73,11 +73,10 @@
                 <p>{{ error }}</p>
             {% endfor %}
             {{ update_form.csrf_token }}
-            Текущий название: {{ current_class.number }}{{ current_class.symbol }}<br>
-            {{ update_form.number }}<br>
-            {{ update_form.symbol }}<br>
-            {{ update_form.class_manager_id }}<br>
-            {{ update_form.school_id }}<br>
+            Текущий номер: {{ current_class.number }}, Укажите новый: {{ update_form.number }}<br>
+            Текущая буква: {{ current_class.symbol }},Укажите новую: {{ update_form.symbol }}<br>
+            Текцщий классный руководитель: {{ current_class.manager }}, Укажите новго: {{ update_form.class_manager_id }}<br>
+            Текущяя школа: {{ current_class.school }}, Укажите новую:{{ update_form.school_id }}<br>
             {{ update_form.submit }}
         </form>
     {% endif %}

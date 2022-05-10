@@ -28,7 +28,7 @@
             <td>{{ student.student_user_data.surname }} {{ student.student_user_data.name }}</td>
             <td><a href="{{ url_for('admin_panel_classes_update', id_=student.student_class_data.id_) }}">{{ student.student_class_data.number }}{{ student.student_class_data.symbol }}</a></td>
             <td>
-                <a href="{{ url_for('admin_panel_rates', filter=student.id_, field='id_') }}">оценки</a>
+                <a href="{{ url_for('admin_panel_rates', student_id=student.id_) }}">оценки</a>
             </td>
             <td>
                 <a href="{{ url_for('admin_panel_mothers_update', id_=student.mother.id_) }}">Мама</a><br>
@@ -70,16 +70,18 @@
                 <p>Error(s): {{ ", ".join(error) }}</p>
             {% endfor %}
             {{ update_form.csrf_token }}
-            {{ update_form.name }}<br>
-            {{ update_form.surname }}<br>
+            Текущее имя: {{ current_student.student_user_data.name }}, Введите новое: {{ update_form.name }}<br>
+            Текущая фамилия: {{ current_student.student_user_data.surname }}, Введите новую: {{ update_form.surname }}<br>
             {{ update_form.password }}<br>
             {{ update_form.password_check }}<br>
-            {{ update_form.email }}<br>
-            {{ update_form.class_id }}<br>
-            {{ update_form.mother_id }}<br>
-            {{ update_form.father_id }}<br>
-            {{ update_form.score }}<br>
-            {{ update_form.achievements }}<br>
+            Текущая почта: {{ current_student.student_user_data.email }}, Введите новую: {{ update_form.email }}<br>
+            Текущий класс: {{ current_student.student_class_data }}, Укажите новый: {{ update_form.class_id }}<br>
+            Текущая мама: {{ current_student.mother }}, Укажите новую: {{ update_form.mother_id }}<br>
+            Текущее папа: {{ current_student.father }}, Укажите нового: {{ update_form.father_id }}<br>
+            Текущие очки: {{ current_student.score }}, Введите новые: {{ update_form.score }}<br>
+            Текущие ачивки:
+            <a href="{{ url_for('admin_panel_students_achievements', id_=current_student.id_) }}">ссылка</a>
+            Укажите новые ачивки: {{ update_form.achievements }}<br>
             {{ update_form.submit }}
         </form>
         <a href="{{ url_for('admin_panel_students_remove', id_=current_student.id_) }}">Удалить</a>
